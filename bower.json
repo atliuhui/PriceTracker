@@ -1,0 +1,24 @@
+{
+  "name": "PriceTracker",
+  "description": "",
+  "main": "index.js",
+  "authors": [
+    "LIU Hui <atliuhui@outlook.com>"
+  ],
+  "license": "MIT",
+  "moduleType": [
+    "node"
+  ],
+  "homepage": "",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "handlebars": "4.0.5",
+    "jquery": "1.11.3"
+  }
+}
