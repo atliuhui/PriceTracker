@@ -1,12 +1,13 @@
+var util = require("util");
 var request = require("request");
 var cheerio = require("cheerio");
-var iconv = require('iconv-lite');
+var iconv = require("iconv-lite");
 
 module.exports.get = function (callback, results) {
     if (results && results.default && results.default.amazon) {
         request({
-            // uri: "http://amazon.cn/dp/{ASIN}.html".replace(/{ASIN}/g, results.default.amazon),
-            uri: "http://amazon.cn/gp/product/{ASIN}".replace(/{ASIN}/g, results.default.amazon),
+            // uri:util.format("http://amazon.cn/dp/%s.html",results.default.amazon),
+            uri: util.format("http://amazon.cn/gp/product/%s", results.default.amazon),
             method: "GET",
             encoding: null,
             timeout: 10000,
@@ -16,14 +17,14 @@ module.exports.get = function (callback, results) {
             if (error) {
                 callback(new Error(error));
             } else if (response.statusCode != 200) {
-                callback(new Error("[amazon_price_get]response.statusCode:{status}".replace(/{status}/g, response.statusCode)));
+                callback(new Error(util.format("[amazon_price_get]response.statusCode: %d", response.statusCode)));
             } else {
                 var content = iconv.decode(body, 'UTF8');
                 var $ = cheerio.load(content);
                 // var title = $("#productTitle").text().trim();
                 var price = $("#priceblock_ourprice").text().replace(/￥/g, "").trim();
 
-                console.log("get amazon price, %s, %f", results.default.amazon, price);
+                console.log("get amazon price, %s, %d", results.default.amazon, price);
                 callback(null, { price: price });
             }
         });

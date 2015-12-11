@@ -1,3 +1,4 @@
+// var _ = require("underscore")._;
 var async = require('async');
 
 var amazon_price = require('./partial/amazon_price.js');
@@ -17,20 +18,54 @@ module.exports.get = function (callback, params) {
                 tmall: "44783214078"
             };
 
-            console.log("product code %s, link code %o", code, results);
+            console.log("product code %s, related code %j", code, results);
             next(null, results);
         },
-        get_amazon_price: ["default", amazon_price.get],
-        get_jd_price: ["default", jd_price.get],
-        get_tmall_price: ["default", tmall_price.get]
+        amazon: ["default", amazon_price.get],
+        jd: ["default", jd_price.get],
+        tmall: ["default", tmall_price.get]
     }, function (error, results) {
-        var s2 = new Date();
+        if (error) {
+            console.error(error);
+            callback(new Error(error));
+        } else {
+            var value = {
+                usetime: ((new Date()) - s1),
+                price: {
+                    amazon: results.amazon.price,
+                    jd: results.jd.price,
+                    tmall: results.tmall.price
+                }
+            };
 
-        callback(error, {
-            usetime: (s2 - s1),
-            amazon_price: results.get_amazon_price.price,
-            jd_price: results.get_jd_price.price,
-            tmall_price: results.get_tmall_price.price
-        });
+            console.info(value);
+            callback(null, value);
+        }
+    });
+};
+
+module.exports.record = function (callback, params) {
+    module.exports.get(function (error, results) {
+        callback(error, results);
+    }, { code: params.code });
+};
+module.exports.recordAll = function (callback, params) {
+    var arr = ["P001", "P002", "P003", "P004", "P005"];
+    // var arr = ["P001", "P002"];
+
+    async.eachSeries(arr, function (item, next) {
+        module.exports.record(function (error, results) {
+            if (error) {
+                next(error);
+            } else {
+                next(null);
+            }
+        }, { code: item });
+    }, function (error, results) {
+        if (error) {
+            console.error(error);
+        }
+
+        callback(null, null);
     });
 };
