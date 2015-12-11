@@ -6,6 +6,12 @@
 			"type": "node",
 			"request": "launch",
 			"program": "index.js"
+		},
+		{
+			"name": "tracker",
+			"type": "node",
+			"request": "launch",
+			"program": "tracker.js"
 		}
 	]
 }

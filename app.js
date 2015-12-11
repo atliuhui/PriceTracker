@@ -6,9 +6,7 @@ var helperException = require('./helpers/exception');
 var helperHandlebars = require('./helpers/handlebars');
 
 var routerIndex = require('./routes/index');
-// var routerStory = require('./routes/story');
-// var routerVenue = require('./routes/venue');
-// var routerPerson = require('./routes/person');
+var routerProduct = require('./routes/product');
 
 var app = express();
 var hbs = expresshandlebars.create({
@@ -24,9 +22,7 @@ app.set('view engine', 'handlebars');
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', routerIndex);
-// app.use('/story', routerStory);
-// app.use('/venue', routerVenue);
-// app.use('/person', routerPerson);
+app.use('/product', routerProduct);
 
 app.use(helperException.notfound);
 app.use(helperException.error);

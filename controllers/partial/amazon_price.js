@@ -3,10 +3,10 @@ var cheerio = require("cheerio");
 var iconv = require('iconv-lite');
 
 module.exports.get = function (callback, results) {
-    if (results && results.code && results.code.jd) {
+    if (results && results.default && results.default.amazon) {
         request({
-            // uri: "http://item.jd.com/{JDCODE}.html".replace(/{JDCODE}/g, results.code.jd),
-            uri: "http://p.3.cn/prices/get?skuid=J_{JDCODE}".replace(/{JDCODE}/g, results.code.jd),
+            // uri: "http://amazon.cn/dp/{ASIN}.html".replace(/{ASIN}/g, results.default.amazon),
+            uri: "http://amazon.cn/gp/product/{ASIN}".replace(/{ASIN}/g, results.default.amazon),
             method: "GET",
             encoding: null,
             timeout: 10000,
@@ -16,12 +16,14 @@ module.exports.get = function (callback, results) {
             if (error) {
                 callback(new Error(error));
             } else if (response.statusCode != 200) {
-                callback(new Error("[jd_price_get]response.statusCode:{status}".replace(/{status}/g, response.statusCode)));
+                callback(new Error("[amazon_price_get]response.statusCode:{status}".replace(/{status}/g, response.statusCode)));
             } else {
                 var content = iconv.decode(body, 'UTF8');
-                // var $ = cheerio.load(content);
-                var price = JSON.parse(content)[0].p;
+                var $ = cheerio.load(content);
+                // var title = $("#productTitle").text().trim();
+                var price = $("#priceblock_ourprice").text().replace(/￥/g, "").trim();
 
+                console.log("get amazon price, %s, %f", results.default.amazon, price);
                 callback(null, { price: price });
             }
         });
