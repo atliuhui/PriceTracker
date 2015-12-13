@@ -10,6 +10,7 @@ module.exports.get = function (callback, results) {
             uri: util.format("http://amazon.cn/gp/product/%s", results.default.amazon),
             method: "GET",
             encoding: null,
+            time: true,
             timeout: 10000,
             followRedirect: true,
             maxRedirects: 10
@@ -19,13 +20,16 @@ module.exports.get = function (callback, results) {
             } else if (response.statusCode != 200) {
                 callback(new Error(util.format("[amazon_price_get]response.statusCode: %d", response.statusCode)));
             } else {
-                var content = iconv.decode(body, 'UTF8');
+                var content = iconv.decode(body, "UTF8");
                 var $ = cheerio.load(content);
                 // var title = $("#productTitle").text().trim();
                 var price = $("#priceblock_ourprice").text().replace(/￥/g, "").trim();
 
                 console.log("get amazon price, %s, %d", results.default.amazon, price);
-                callback(null, { price: price });
+                callback(null, {
+                    usetime: response.elapsedTime,
+                    price: price
+                });
             }
         });
     } else {

@@ -1,6 +1,7 @@
+var util = require("util");
 
 module.exports.notfound = function (req, res, next) {
-    var err = new Error('Not Found');
+    var err = new Error("Not Found");
     err.status = 404;
     return next(err);
 };
@@ -10,7 +11,7 @@ module.exports.error = function (err, req, res, next) {
 
     res.status(err.status || 500).format({
         html: function () {
-            res.render('error', {
+            res.render("error", {
                 message: err.message,
                 status: res.statusCode
             });
@@ -28,7 +29,7 @@ module.exports.error = function (err, req, res, next) {
             });
         },
         text: function () {
-            res.send(res.status + ' | ' + err.message + '\n');
+            res.send(util.format("%s | %s\n",res.status, err.message));
         }
     });
 };

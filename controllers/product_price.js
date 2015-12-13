@@ -1,25 +1,47 @@
-// var _ = require("underscore")._;
-var async = require('async');
+var _ = require("underscore")._;
+var async = require("async");
 
-var amazon_price = require('./partial/amazon_price.js');
-var jd_price = require('./partial/jd_price.js');
-var tmall_price = require('./partial/tmall_price.js');
+// var mongoose = require("../helpers/dbconnection").mongoose;
+
+var Product = require("../models/product").Product;
+var ProductTracker = require("../models/product").ProductTracker;
+var ProductPrice = require("../models/product").ProductPrice;
+
+var amazon_price = require("./partial/amazon_price.js");
+var jd_price = require("./partial/jd_price.js");
+var tmall_price = require("./partial/tmall_price.js");
+
+var DICT_PRODUCT_SOURCE = require("../helpers/global").DICT_PRODUCT_SOURCE;
+var USER_SYSTEM = require("../helpers/global").USER_SYSTEM;
 
 module.exports.get = function (callback, params) {
-    var s1 = new Date();
-
+    var begintime = new Date();
     async.auto({
         default: function (next) {
-            var code = params.code;
+            var pid = params.pid;
+            var query = ProductTracker.find({ pid: pid });
+            query.exec(function (error, trackers) {
+                var results = {};
 
-            var results = {
-                amazon: "B002J03PBA",
-                jd: "1952025209",
-                tmall: "44783214078"
-            };
+                _.each(trackers, function (item, index) {
+                    switch (item.source) {
+                        case DICT_PRODUCT_SOURCE.jd:
+                            results.jd = item.code;
+                            break;
+                        case DICT_PRODUCT_SOURCE.tmall:
+                            results.tmall = item.code;
+                            break;
+                        case DICT_PRODUCT_SOURCE.amazon:
+                            results.amazon = item.code;
+                            break;
+                        default:
+                            break;
+                    }
+                });
 
-            console.log("product code %s, related code %j", code, results);
-            next(null, results);
+                console.log("product code %s, related code %j", pid, results);
+                next(null, results);
+            });
         },
         amazon: ["default", amazon_price.get],
         jd: ["default", jd_price.get],
@@ -30,11 +52,22 @@ module.exports.get = function (callback, params) {
             callback(new Error(error));
         } else {
             var value = {
-                usetime: ((new Date()) - s1),
+                pid: params.pid,
+                allusetime: ((new Date()) - begintime),
+                usetime:{
+                    jd: results.jd.usetime,
+                    tmall: results.tmall.usetime,
+                    amazon: results.amazon.usetime
+                },
+                code: {
+                    jd: results.default.jd,
+                    tmall: results.default.tmall,
+                    amazon: results.default.amazon
+                },
                 price: {
-                    amazon: results.amazon.price,
                     jd: results.jd.price,
-                    tmall: results.tmall.price
+                    tmall: results.tmall.price,
+                    amazon: results.amazon.price
                 }
             };
 
@@ -46,26 +79,54 @@ module.exports.get = function (callback, params) {
 
 module.exports.record = function (callback, params) {
     module.exports.get(function (error, results) {
+        ProductPrice.create([
+            {
+                pid: results.pid,
+                source: DICT_PRODUCT_SOURCE.jd,
+                code: results.code.jd,
+                price: results.price.jd,
+                usetime: results.usetime.jd,
+                datetime: new Date(),
+                creator: USER_SYSTEM
+            }, {
+                pid: results.pid,
+                source: DICT_PRODUCT_SOURCE.tmall,
+                code: results.code.tmall,
+                price: results.price.tmall,
+                usetime: results.usetime.tmall,
+                datetime: new Date(),
+                creator: USER_SYSTEM
+            }, {
+                pid: results.pid,
+                source: DICT_PRODUCT_SOURCE.amazon,
+                code: results.code.amazon,
+                price: results.price.amazon,
+                usetime: results.usetime.amazon,
+                datetime: new Date(),
+                creator: USER_SYSTEM
+            }
+        ]);
+
         callback(error, results);
-    }, { code: params.code });
+    }, { pid: params.pid });
 };
 module.exports.recordAll = function (callback, params) {
-    var arr = ["P001", "P002", "P003", "P004", "P005"];
-    // var arr = ["P001", "P002"];
-
-    async.eachSeries(arr, function (item, next) {
-        module.exports.record(function (error, results) {
+    var query = Product.find();
+    query.exec(function (error, products) {
+        async.eachSeries(products, function (item, next) {
+            module.exports.record(function (error, results) {
+                if (error) {
+                    next(error);
+                } else {
+                    next(null);
+                }
+            }, { pid: item.id });
+        }, function (error, results) {
             if (error) {
-                next(error);
-            } else {
-                next(null);
+                console.error(error);
             }
-        }, { code: item });
-    }, function (error, results) {
-        if (error) {
-            console.error(error);
-        }
 
-        callback(null, null);
+            callback(null, null);
+        });
     });
 };

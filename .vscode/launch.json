@@ -12,6 +12,18 @@
 			"type": "node",
 			"request": "launch",
 			"program": "tracker.js"
+		},
+		{
+			"name": "seeding",
+			"type": "node",
+			"request": "launch",
+			"program": "seed.js"
+		},
+		{
+			"name": "tester",
+			"type": "node",
+			"request": "launch",
+			"program": "test.js"
 		}
 	]
 }
