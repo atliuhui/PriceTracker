@@ -1,5 +1,7 @@
 var util = require("util");
 
+var logger = require("./logging").getLogger("exception");
+
 module.exports.notfound = function (req, res, next) {
     var err = new Error("Not Found");
     err.status = 404;
@@ -7,7 +9,7 @@ module.exports.notfound = function (req, res, next) {
 };
 
 module.exports.error = function (err, req, res, next) {
-    console.error(err.stack);
+    logger.trace(err.stack);
 
     res.status(err.status || 500).format({
         html: function () {

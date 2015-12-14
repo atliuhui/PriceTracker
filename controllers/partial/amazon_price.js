@@ -3,6 +3,8 @@ var request = require("request");
 var cheerio = require("cheerio");
 var iconv = require("iconv-lite");
 
+var logger = require("../../helpers/logging").getLogger("price-amazon");
+
 module.exports.get = function (callback, results) {
     if (results && results.default && results.default.amazon) {
         request({
@@ -25,7 +27,7 @@ module.exports.get = function (callback, results) {
                 // var title = $("#productTitle").text().trim();
                 var price = $("#priceblock_ourprice").text().replace(/￥/g, "").trim();
 
-                console.log("get amazon price, %s, %d", results.default.amazon, price);
+                logger.info("get amazon price, %s, %d", results.default.amazon, price);
                 callback(null, {
                     usetime: response.elapsedTime,
                     price: price

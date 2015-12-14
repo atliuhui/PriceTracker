@@ -3,6 +3,8 @@ var request = require("request");
 var cheerio = require("cheerio");
 var iconv = require("iconv-lite");
 
+var logger = require("../../helpers/logging").getLogger("price-tmall");
+
 module.exports.get = function (callback, results) {
     if (results && results.default && results.default.tmall) {
         request({
@@ -25,7 +27,7 @@ module.exports.get = function (callback, results) {
                 // var price = JSON.parse("{{kv}}".replace(/{kv}/g, content.match(/"reservePrice":"[0-9\.\,]+"/gim))).reservePrice;
                 var price = JSON.parse(util.format("{%s}", content.match(/"reservePrice":"[0-9\.\,]+"/gim))).reservePrice;
 
-                console.log("get tmall price, %s, %d", results.default.tmall, price);
+                logger.info("get tmall price, %s, %d", results.default.tmall, price);
                 callback(null, {
                     usetime: response.elapsedTime,
                     price: price

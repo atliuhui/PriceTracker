@@ -3,6 +3,8 @@ var request = require("request");
 var cheerio = require("cheerio");
 var iconv = require("iconv-lite");
 
+var logger = require("../../helpers/logging").getLogger("price-jd");
+
 module.exports.get = function (callback, results) {
     if (results && results.default && results.default.jd) {
         request({
@@ -24,7 +26,7 @@ module.exports.get = function (callback, results) {
                 // var $ = cheerio.load(content);
                 var price = JSON.parse(content)[0].p;
 
-                console.log("get jd price, %s, %d", results.default.jd, price);
+                logger.info("get jd price, %s, %d", results.default.jd, price);
                 callback(null, {
                     usetime: response.elapsedTime,
                     price: price

@@ -1,33 +1,35 @@
 var util = require("util");
 var mongoose = require("mongoose");
 
+var logger = require("./logging").getLogger("dbconnection");
+
 var DB_URI = require("./global").DB_URI;
 
-mongoose.connect(DB_URI, { server: { auto_reconnect: true } });
-console.log("creating global mongoose connection");
-
 mongoose.connection.on("connected", function () {
-    console.log("mongoose connection success");
+    logger.info("mongoose connection success");
 });
 
 mongoose.connection.on("close", function () {
     mongoose.connect(DB_URI, { server: { auto_reconnect: true } });
-    console.log("mongoose reconnection success");
+    logger.info("mongoose reconnection success");
 });
 
 mongoose.connection.on("error", function (error) {
-    console.log(util.format("mongoose connection error: %s", error));
+    logger.info(util.format("mongoose connection error: %o", error));
 });
 
 mongoose.connection.on("disconnected", function () {
-    console.log("mongoose disconnected");
+    logger.info("mongoose disconnected");
 });
 
 process.on("SIGINT", function () {
     mongoose.connection.close(function () {
-        console.log("mongoose disconnected through service termination");
+        logger.info("mongoose disconnected through service termination");
         process.exit(0);
     });
 });
+
+mongoose.connect(DB_URI, { server: { auto_reconnect: true } });
+logger.info("creating global mongoose connection");
 
 module.exports.mongoose = mongoose;

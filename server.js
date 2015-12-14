@@ -8,7 +8,7 @@ var helperHandlebars = require("./helpers/handlebars");
 var routerIndex = require("./routes/index");
 var routerProduct = require("./routes/product");
 
-var app = express();
+var server = express();
 var hbs = expresshandlebars.create({
 	defaultLayout: "main",
 	helpers: {
@@ -16,15 +16,15 @@ var hbs = expresshandlebars.create({
     }
 });
 
-app.engine("handlebars", hbs.engine);
-app.set("view engine", "handlebars");
+server.engine("handlebars", hbs.engine);
+server.set("view engine", "handlebars");
 
-app.use(express.static(path.join(__dirname, "public")));
+server.use(express.static(path.join(__dirname, "public")));
 
-app.use("/", routerIndex);
-app.use("/product", routerProduct);
+server.use("/", routerIndex);
+server.use("/product", routerProduct);
 
-app.use(helperException.notfound);
-app.use(helperException.error);
+server.use(helperException.notfound);
+server.use(helperException.error);
 
-module.exports = app;
+server.listen(3000);
