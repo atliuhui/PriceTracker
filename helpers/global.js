@@ -1,7 +1,7 @@
 module.exports.DICT_PRODUCT_SOURCE = {
-	jd: "jd",
-	tmall: "tmall",
-	amazon: "amazon"
+	jd: 'jd',
+	tmall: 'tmall',
+	amazon: 'amazon'
 };
 module.exports.ENUM_PRODUCT_SOURCE = [
 	module.exports.DICT_PRODUCT_SOURCE.jd,
@@ -9,6 +9,6 @@ module.exports.ENUM_PRODUCT_SOURCE = [
 	module.exports.DICT_PRODUCT_SOURCE.amazon
 ];
 
-module.exports.DB_URI = "mongodb://localhost/test";
+module.exports.DB_URI = 'mongodb://localhost/test';
 
-module.exports.USER_SYSTEM = "admin";
+module.exports.USER_SYSTEM = 'admin';

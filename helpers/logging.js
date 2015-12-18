@@ -1,13 +1,13 @@
-var log4js = require("log4js");
+var log4js = require('log4js');
 
 log4js.configure({
     appenders: [
         {
-            type: "console"
+            type: 'console'
         }, {
-            type: "dateFile",
-            filename: "logs/",
-            pattern: "yyyyMMddhh.log",//yyyyMMddhhmmss
+            type: 'dateFile',
+            filename: 'logs/',
+            pattern: 'yyyyMMddhh.log',//yyyyMMddhhmmss
             alwaysIncludePattern: true
         }
     ],

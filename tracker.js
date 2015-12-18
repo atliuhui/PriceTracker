@@ -1,8 +1,8 @@
-var logger = require("./helpers/logging").getLogger("tracker");
+var logger = require('./helpers/logging').getLogger('tracker');
 
-var product_price = require("./controllers/product_price");
+var productPrice = require('./controllers/product_price');
 
-var nexttime = function () {
+var nextTime = function () {
 	var now = new Date();
 	var next = new Date(now);
 	next.setMinutes(now.getMinutes() + 1);
@@ -22,14 +22,14 @@ var timer = function (params) {
 };
 var processer = function (callback, params) {
 	if (params.delay) {
-		product_price.recordAll(function (error, results) {
-			var time = nexttime();
-			logger.info("Now: %s | Next: %s", time.now.toString(), time.next.toString());
+		productPrice.recordAllProductPrice(function (error, results) {
+			var time = nextTime();
+			logger.info('Now: %s | Next: %s', time.now.toString(), time.next.toString());
 			callback({ delay: time.delay });
 		});
 	} else {
-		var time = nexttime();
-		logger.info("Now: %s | Next: %s", time.now.toString(), time.next.toString());
+		var time = nextTime();
+		logger.info('Now: %s | Next: %s', time.now.toString(), time.next.toString());
 		callback({ delay: time.delay });
 	}
 };

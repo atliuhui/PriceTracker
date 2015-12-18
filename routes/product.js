@@ -1,24 +1,37 @@
-var express = require("express");
+var express = require('express');
 
-var product_price = require("../controllers/product_price.js");
+var product_price = require('../controllers/product_price.js');
 
 var router = express.Router();
 
-router.get("/", function (req, res, next) {
-    res.render("index", {
+router.get('/', function (req, res, next) {
+    res.render('index', {
         data: {}
     });
 });
-router.get("/:code/price", function (req, res, next) {
-    product_price.get(function (error, results) {
+router.get('/:code/price', function (req, res, next) {
+    product_price.getProductPrice(function (error, results) {
         if (error) {
-            next(new Error(error));
+            next(error);
         } else {
-            res.render("product", {
+            res.render('product', {
                 data: results
             });
         }
-    }, { code: req.param("code") });
+    }, { pid: req.param('code') });
+});
+router.get('/:code/history', function (req, res, next) {
+    product_price.getProductPriceHistory(function (error, results) {
+        if (error) {
+            next(error);
+        } else {
+            res.format({
+                json: function () {
+                    res.json(res.status, results);
+                }
+            });
+        }
+    }, { pid: req.param('code') });
 });
 
 module.exports = router;

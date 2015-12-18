@@ -1,35 +1,35 @@
-var util = require("util");
-var mongoose = require("mongoose");
+var util = require('util');
+var mongoose = require('mongoose');
 
-var logger = require("./logging").getLogger("dbconnection");
+var logger = require('./logging').getLogger('dbconnection');
 
-var DB_URI = require("./global").DB_URI;
+var DB_URI = require('./global').DB_URI;
 
-mongoose.connection.on("connected", function () {
-    logger.info("mongoose connection success");
+mongoose.connection.on('connected', function () {
+    logger.info('mongoose connection success');
 });
 
-mongoose.connection.on("close", function () {
+mongoose.connection.on('close', function () {
     mongoose.connect(DB_URI, { server: { auto_reconnect: true } });
-    logger.info("mongoose reconnection success");
+    logger.info('mongoose reconnection success');
 });
 
-mongoose.connection.on("error", function (error) {
-    logger.info(util.format("mongoose connection error: %o", error));
+mongoose.connection.on('error', function (error) {
+    logger.error('mongoose connection error: ', error);
 });
 
-mongoose.connection.on("disconnected", function () {
-    logger.info("mongoose disconnected");
+mongoose.connection.on('disconnected', function () {
+    logger.info('mongoose disconnected');
 });
 
-process.on("SIGINT", function () {
+process.on('SIGINT', function () {
     mongoose.connection.close(function () {
-        logger.info("mongoose disconnected through service termination");
+        logger.info('mongoose disconnected through service termination');
         process.exit(0);
     });
 });
 
 mongoose.connect(DB_URI, { server: { auto_reconnect: true } });
-logger.info("creating global mongoose connection");
+logger.info('creating global mongoose connection');
 
 module.exports.mongoose = mongoose;

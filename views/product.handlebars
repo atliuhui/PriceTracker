@@ -1,14 +1,179 @@
-<h1>Price Comparison</h1>
-<div>
-	<div>JD</div>
-	{{{data.price.jd}}}
+<script type="text/javascript" src="/javascripts/underscore/underscore-min.js"></script>
+<script type="text/javascript" src="/javascripts/crossfilter/crossfilter.min.js"></script>
+<script type="text/javascript" src="/javascripts/d3/d3.min.js"></script>
+<script type="text/javascript" src="/javascripts/highcharts/highcharts.js"></script>
+<style>
+	body{
+		background-image: url('/images/1952025209.jpg');
+	}
+</style>
+<script type="text/javascript">
+// Highcharts.setOptions({
+// 	lang: {
+// 		months: ['一月', '二月', '三月', '四月', '五月', '六月', '七月', '八月', '九月', '十月', '十一月', '十二月'],
+// 		shortMonths: ['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月'],
+// 		weekdays: ['周日', '周一', '周二', '周三', '周四', '周五', '周六']
+// 	}
+// });
+$(function(){
+	// var toDictJson = function(kvPairList){
+	// 	return _.reduce(kvPairList, function(results, item){
+	// 		results[item.key] = item.value;
+	// 		return results; 
+	// 	}, {});
+	// };
+	
+	var option = {
+        title: { text: '' },
+        credits: { enabled: false },
+        exporting: { enabled: false },
+        legend: { enabled: false },
+        tooltip: { enabled: false },
+        colors: ['#7cb5ec', '#434348', '#90ed7d', '#f7a35c', '#8085e9', '#f15c80', '#e4d354', '#2b908f', '#f45b5b', '#91e8e1'],
+        chart: {
+			type: 'line',
+            // width: width,
+            // height: height,
+			margin: [0, 0, 30, 0]
+        },
+        xAxis: {
+            tickWidth: 0,
+            startOnTick: true,
+            endOnTick: true,
+            lineColor: '#eee',
+			type: 'datetime',
+            labels: {
+                padding: 0,
+                rotation: 0,
+                style: {
+                    color: '#999',
+                    fontWeight: 'normal',
+                    textOverflow: 'none'
+                }
+            }
+        },
+        yAxis: {
+            title: { text: '' },
+			type: 'linear',
+            gridLineWidth: 0,
+			min: 0,
+            plotLines: [],
+			labels : { enabled: false }
+        },
+        plotOptions: {
+            line: {
+                enableMouseTracking: false,
+                allowPointSelect: false,
+                lineWidth: 1,
+                marker: {
+                    lineWidth: 0,
+                    radius: 3
+                }
+            }
+        }
+    };
+	
+	$.ajax({
+		type: 'GET',
+		url: '/product/566e32b7b642d69c074e23b3/history',
+		dataType: 'json',
+		success: function (data) {
+			var dataset = crossfilter(data);
+			var dimension = {}, 
+				group = {};
+			dimension.source = dataset.dimension(function(item) { return item.source; });
+			group.source = dimension.source.group().reduce(function(results, item){
+				results._values.push(item.usetime);
+				results.min = Math.min(Math.min.apply(this, results._values));
+				results.max = Math.max(Math.max.apply(this, results._values));
+				results.sum = parseInt(results.sum + item.usetime);
+				results.count = parseInt(results.count + 1);
+				results.average = parseInt(results.sum / results.count);
+				return results;
+			}, function(results, item){
+				results._values.splice(_.indexOf(results._values, item.usetime), 1);
+				results.min = Math.min(Math.min.apply(this, results._values));
+				results.max = Math.max(Math.max.apply(this, results._values));
+				results.sum = parseInt(results.sum - item.usetime);
+				results.count = parseInt(results.count - 1);
+				results.average = parseInt(results.sum / results.count);
+				return results;
+			}, function(){
+				return { min: 0, max: 0, sum: 0, count: 0, average: 0, _values: [] };
+			});
+			
+			var sourceGroup = group.source.top(Infinity);
+			option.xAxis.tickInterval = 24 * 60 * 60 * 1000;
+            option.xAxis.labels.formatter = function () {
+				return Highcharts.dateFormat('%a', new Date(this.value));
+            };
+			_.each(sourceGroup, function(item, index){
+				option.yAxis.plotLines.push({
+					color: '#ccc',
+					value: item.value.max,
+					label: {
+						text: '{value}(MAX)'.replace(/{value}/g, item.key),
+						style: { color: '#ccc' }
+					},
+					dashStyle: 'Dot',
+					width: 1
+				});
+			});
+			option.series = _.map(sourceGroup, function (group, index) {
+				return {
+					animation: true,
+					name: group.key,
+					color: option.colors[index],
+					marker: { lineColor: option.colors[index] },
+					// zIndex: source.datas.length - index,
+					data: _.map(dimension.source.filter(group.key).top(Infinity),function(item, index){
+						return [(new Date(item.datetime)).getTime(), item.usetime];
+					})
+				};
+			});
+			
+			$('#chart').highcharts(option);
+		}
+	});
+});
+
+</script>
+<div class="container">
+	<div class="row">
+		<div class="col-md-12">
+			<h1>Price Comparison</h1>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-md-4">
+			<div style="background-color: #000;opacity: 0.9;color: #fff; margin: 5px; padding: 20px;">
+				<div>JD</div>
+				{{{data.price.jd}}}
+			</div>
+		</div>
+		<div class="col-md-4">
+			<div style="background-color: #000;opacity: 0.9;color: #fff; margin: 5px; padding: 20px;">
+				<div>AMAZON</div>
+				{{{data.price.amazon}}}
+			</div>
+		</div>
+		<div class="col-md-4">
+			<div style="background-color: #000;opacity: 0.9;color: #fff; margin: 5px; padding: 20px;">
+				<div>TMALL</div>
+				{{{data.price.tmall}}}
+			</div>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-md-12">
+			<h5>usetime:{{{data.allusetime}}}</h5>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-md-12">
+			<div style="background-color: #000;opacity: 0.9;color: #fff; margin: 5px; padding: 20px;">
+				<div id="chart"></div>
+			</div>
+		</div>
+	</div>
 </div>
-<div>
-	<div>AMAZON</div>
-	{{{data.price.amazon}}}
-</div>
-<div>
-	<div>TMALL</div>
-	{{{data.price.tmall}}}
-</div>
-<h5>usetime:{{{data.usetime}}}</h5>
