@@ -43,4 +43,22 @@ ProductPriceSchema.static('findByPId', function (pid, callback) {
         .select('source code datetime price usetime')
         .exec(callback);
 });
+ProductPriceSchema.static('getJDLatest', function (pid, callback) {
+    return this.find({ pid: pid, source: 'jd' })
+        .sort({ datetime: 'desc' })
+        .limit(1)
+        .exec(callback);
+});
+ProductPriceSchema.static('getTMALLLatest', function (pid, callback) {
+    return this.find({ pid: pid, source: 'tmall' })
+        .sort({ datetime: 'desc' })
+        .limit(1)
+        .exec(callback);
+});
+ProductPriceSchema.static('getAMAZONLatest', function (pid, callback) {
+    return this.find({ pid: pid, source: 'amazon' })
+        .sort({ datetime: 'desc' })
+        .limit(1)
+        .exec(callback);
+});
 module.exports.ProductPrice = mongoose.model('ProductPrice', ProductPriceSchema);

@@ -10,9 +10,10 @@ var routerProduct = require('./routes/product');
 
 var server = express();
 var hbs = expresshandlebars.create({
-	defaultLayout: 'main',
-	helpers: {
-        json: helperHandlebars.json
+    defaultLayout: 'main',
+    helpers: {
+        json: helperHandlebars.json,
+        format: helperHandlebars.format
     }
 });
 

@@ -2,11 +2,6 @@
 <script type="text/javascript" src="/javascripts/crossfilter/crossfilter.min.js"></script>
 <script type="text/javascript" src="/javascripts/d3/d3.min.js"></script>
 <script type="text/javascript" src="/javascripts/highcharts/highcharts.js"></script>
-<style>
-	body{
-		background-image: url('/images/1952025209.jpg');
-	}
-</style>
 <script type="text/javascript">
 // Highcharts.setOptions({
 // 	lang: {
@@ -138,42 +133,113 @@ $(function(){
 });
 
 </script>
-<div class="container">
+<div class="container" style="opacity: 0.95;">
+    <header></header>
 	<div class="row">
 		<div class="col-md-12">
-			<h1>Price Comparison</h1>
+            <div id="container" style="background-color: #fff;">
+                <div class="row">
+                    <div class="col-md-12">
+                        <article>
+                            <section class="index">
+                                <cite>羽绒服外套</cite>
+                                <ul class="tag">
+                                    <li>JEEP</li>
+                                    <li>吉普</li>
+                                    <li>男装</li>
+                                    <li>吉普</li>
+                                    <li>秋冬</li>
+                                    <li>商务休闲</li>
+                                    <li>大码</li>
+                                    <li>立领</li>
+                                    <li>GW15WJ801</li>
+                                    <li>K4</li>
+                                    <li>180/96B(54)</li>
+                                </ul>
+                            </section>
+                            <section class="content">
+                                <cite>简介</cite>
+                                <p>京东平台卖家销售并发货的商品，由平台卖家提供发票和相应的售后服务。请您放心购买！注：因厂家会在没有任何提前通知的情况下更改产品包装、产地或者一些附件，本司不能确保客户收到的货物与商城图片、产地、附件说明完全一致。只能确保为原厂正货！并且保证与当时市场上同样主流新品一致。若本商城没有及时更新，请大家谅解！</p>
+                                <figure>
+                                    <figcaption>整体效果</figcaption>
+                                    <img src="http://img12.360buyimg.com/cms/jfs/t2218/35/1720027991/223041/6e651f91/56710d9dN710d8017.jpg" />
+                                </figure>
+                            </section>
+                            <section class="content">
+                                <cite>正面</cite>
+                                <p>京东平台卖家销售并发货的商品，由平台卖家提供发票和相应的售后服务。请您放心购买！注：因厂家会在没有任何提前通知的情况下更改产品包装、产地或者一些附件，本司不能确保客户收到的货物与商城图片、产地、附件说明完全一致。只能确保为原厂正货！并且保证与当时市场上同样主流新品一致。若本商城没有及时更新，请大家谅解！</p>
+                                <figure>
+                                    <figcaption>整体效果</figcaption>
+                                    <img src="http://img30.360buyimg.com/popWaterMark/jfs/t2371/252/444019340/26712/e0bc1cd1/560b4c8cN44ce3fb4.jpg" />
+                                </figure>
+                            </section>
+                            <section class="content">
+                                <cite>引用自</cite>
+                                <blockquote cite="http://item.jd.com/1765466541.html">
+                                    <p>http://item.jd.com/1765466541.html</p>
+                                    <p>http://item.jd.com/1765466541.html</p>
+                                </blockquote>
+                            </section>
+                        </article>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card">
+                            <div class="property">
+                                <div class="icon"><i class="fa fa-at"></i></div>
+                                <div class="text">JD</div>
+                            </div>
+                            <div class="property">
+                                <div class="icon"><i class="fa fa-cny"></i></div>
+                                <div class="text">{{data.price.jd}}</div>
+                            </div>
+                            <div class="property">
+                                <div class="icon"><i class="fa fa-calendar"></i></div>
+                                <div class="text">{{format data.datetime.jd "MMMM DD"}}&nbsp;|{{format data.datetime.jd "dddd"}}</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card">
+                            <div class="property">
+                                <div class="icon"><i class="fa fa-at"></i></div>
+                                <div class="text">TMALL</div>
+                            </div>
+                            <div class="property">
+                                <div class="icon"><i class="fa fa-cny"></i></div>
+                                <div class="text">{{data.price.tmall}}</div>
+                            </div>
+                            <div class="property">
+                                <div class="icon"><i class="fa fa-calendar"></i></div>
+                                <div class="text">{{format data.datetime.tmall "MMMM DD"}}&nbsp;|{{format data.datetime.tmall "dddd"}}</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card">
+                            <div class="property">
+                                <div class="icon"><i class="fa fa-at"></i></div>
+                                <div class="text">AMAZON</div>
+                            </div>
+                            <div class="property">
+                                <div class="icon"><i class="fa fa-cny"></i></div>
+                                <div class="text">{{data.price.amazon}}</div>
+                            </div>
+                            <div class="property">
+                                <div class="icon"><i class="fa fa-calendar"></i></div>
+                                <div class="text">{{format data.datetime.amazon "MMMM DD"}}&nbsp;|{{format data.datetime.amazon "dddd"}}</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-12">
+                        <div class="chart">
+                            <div id="chart"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
 		</div>
 	</div>
-	<div class="row">
-		<div class="col-md-4">
-			<div style="background-color: #000;opacity: 0.9;color: #fff; margin: 5px; padding: 20px;">
-				<div>JD</div>
-				{{{data.price.jd}}}
-			</div>
-		</div>
-		<div class="col-md-4">
-			<div style="background-color: #000;opacity: 0.9;color: #fff; margin: 5px; padding: 20px;">
-				<div>AMAZON</div>
-				{{{data.price.amazon}}}
-			</div>
-		</div>
-		<div class="col-md-4">
-			<div style="background-color: #000;opacity: 0.9;color: #fff; margin: 5px; padding: 20px;">
-				<div>TMALL</div>
-				{{{data.price.tmall}}}
-			</div>
-		</div>
-	</div>
-	<div class="row">
-		<div class="col-md-12">
-			<h5>usetime:{{{data.allusetime}}}</h5>
-		</div>
-	</div>
-	<div class="row">
-		<div class="col-md-12">
-			<div style="background-color: #000;opacity: 0.9;color: #fff; margin: 5px; padding: 20px;">
-				<div id="chart"></div>
-			</div>
-		</div>
-	</div>
+    <footer>
+        <h5>usetime:{{{data.allusetime}}}</h5>
+    </footer>
 </div>

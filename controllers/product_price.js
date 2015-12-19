@@ -17,6 +17,78 @@ var USER_SYSTEM = require('../helpers/global').USER_SYSTEM;
 module.exports.getProductPrice = function (callback, params) {
     var begintime = new Date();
     async.auto({
+        jd: function (next) {
+            ProductPrice.getJDLatest(params.pid, function (error, results) {
+                if (error) {
+                    next(new Error(error));
+                } else if (results.length !== 1) {
+                    next(null, null);
+                } else {
+                    next(null, results[0]);
+                }
+            });
+        },
+        tmall: function (next) {
+            ProductPrice.getTMALLLatest(params.pid, function (error, results) {
+                if (error) {
+                    next(new Error(error));
+                } else if (results.length !== 1) {
+                    next(null, null);
+                } else {
+                    next(null, results[0]);
+                }
+            });
+        },
+        amazon: function (next) {
+            ProductPrice.getAMAZONLatest(params.pid, function (error, results) {
+                if (error) {
+                    next(new Error(error));
+                } else if (results.length !== 1) {
+                    next(null, null);
+                } else {
+                    next(null, results[0]);
+                }
+            });
+        }
+    }, function (error, results) {
+        if (error) {
+            logger.error('[CODE]317: ', error);
+            callback(new Error('317'));
+        } else {
+            var value = {
+                pid: params.pid,
+                allusetime: ((new Date()) - begintime),
+                usetime: {
+                    jd: results.jd.usetime,
+                    tmall: results.tmall.usetime,
+                    amazon: results.amazon.usetime
+                },
+                code: {
+                    jd: results.jd.code,
+                    tmall: results.tmall.code,
+                    amazon: results.amazon.code
+                },
+                price: {
+                    jd: results.jd.price,
+                    tmall: results.tmall.price,
+                    amazon: results.amazon.price
+                },
+                datetime: {
+                    jd: results.jd.datetime,
+                    tmall: results.tmall.datetime,
+                    amazon: results.amazon.datetime
+                }
+            };
+
+            logger.debug(value);
+            callback(null, value);
+        }
+    });
+};
+
+module.exports.loadProductPrice = function (callback, params) {
+    var begintime = new Date();
+    async.auto({
         default: function (next) {
             var pid = params.pid;
             ProductTracker.findByPId({ pid: pid }, function (error, trackers) {
@@ -57,6 +129,7 @@ module.exports.getProductPrice = function (callback, params) {
             logger.error('[CODE]315: ', error);
             callback(new Error('315'));
         } else {
+            var datetime = new Date();
             var value = {
                 pid: params.pid,
                 allusetime: ((new Date()) - begintime),
@@ -74,6 +147,11 @@ module.exports.getProductPrice = function (callback, params) {
                     jd: results.jd.price,
                     tmall: results.tmall.price,
                     amazon: results.amazon.price
+                },
+                datetime: {
+                    jd: datetime,
+                    tmall: datetime,
+                    amazon: datetime
                 }
             };
 
@@ -97,7 +175,7 @@ module.exports.getProductPriceHistory = function (callback, params) {
 };
 
 module.exports.recordProductPrice = function (callback, params) {
-    module.exports.getProductPrice(function (error, results) {
+    module.exports.loadProductPrice(function (error, results) {
         if (error) {
             logger.error('[CODE]312: ', error);
             callback(new Error('312'));
