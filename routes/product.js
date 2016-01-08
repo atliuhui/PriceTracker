@@ -14,6 +14,9 @@ router.get('/:code/price', function (req, res, next) {
         if (error) {
             next(error);
         } else {
+            results.title = '产品详细';
+            results.poster = results.product.poster;
+            results.content = results.product.content;
             res.render('product', {
                 data: results
             });

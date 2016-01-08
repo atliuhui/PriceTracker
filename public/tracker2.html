@@ -1,0 +1,470 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN" xml:lang="zh" xmlns="http://www.w3.org/1999/xhtml" style="overflow: hidden;">
+
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+    <meta name="viewport" content="user-scalable=no,width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1" />
+    <title>WHEN</title>
+    <link rel="stylesheet" type="text/css" href="/javascripts/normalize-css/normalize.css" />
+    <link rel="stylesheet" type="text/css" href="/stylesheets/app.css" />
+    <script type="text/javascript" src="/javascripts/jquery/jquery.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="/javascripts/bootstrap/css/bootstrap.min.css" />
+    <script type="text/javascript" src="/javascripts/bootstrap/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="/javascripts/font-awesome/css/font-awesome.min.css" />
+    <script type="text/javascript" src="/javascripts/handlebars/handlebars.min.js"></script>
+    <script type="text/javascript" src="/javascripts/uri/URI.min.js"></script>
+    <script type="text/javascript" src="/javascripts/underscore/underscore-min.js"></script>
+    <script type="text/javascript" src="/javascripts/backbone/backbone-min.js"></script>
+    <script type="text/javascript" src="/javascripts/localStorage/backbone.localStorage-min.js"></script>
+    <!--<script type="text/javascript" src="/javascripts/localforage/localforage.min.js"></script>-->
+    <!--<script type="text/javascript" src="/javascripts/slimscroll/jquery.slimscroll.min.js"></script>-->
+    <link rel="stylesheet" type="text/css" href="/javascripts/tagsinput/bootstrap-tagsinput.css" />
+    <script type="text/javascript" src="/javascripts/tagsinput/bootstrap-tagsinput.min.js"></script>
+    <script type="text/javascript" src="/javascripts/app.js"></script>
+    <script id="template-edit" type="text/template">
+        <form>
+            <div class="form-group">
+                <label for="title">Title</label>
+                <input type="hidden" class="form-control" data-cid="id" placeholder="Title">
+                <input type="text" class="form-control" data-cid="title" placeholder="Title">
+            </div>
+            <div class="form-group">
+                <label for="tags">Tags</label>
+                <input type="text" class="form-control" data-cid="tags" data-role="tagsinput" placeholder="Tags">
+                <p class="help-block">Example.</p>
+            </div>
+            <div class="form-group">
+                <label for="poster">Poster URL</label>
+                <input type="text" class="form-control" data-cid="poster" placeholder="Poster URL">
+                <p class="help-block">Example.</p>
+            </div>
+            <div class="form-group">
+                <label for="content">Content</label>
+                <textarea class="form-control" data-cid="content" rows="3" placeholder="Content"></textarea>
+                <p class="help-block">Example.</p>
+            </div>
+            <div class="form-group">
+                <label>Price URL</label>
+                <div class="input-group">
+                    <div class="input-group-addon">JD</div>
+                    <input type="text" class="form-control" data-cid="source_jd_url" placeholder="JD Price URL">
+                </div>
+                <div class="input-group">
+                    <div class="input-group-addon">TM</div>
+                    <input type="text" class="form-control" data-cid="source_tmall_url" placeholder="TMall Price URL">
+                </div>
+                <div class="input-group">
+                    <div class="input-group-addon">AM</div>
+                    <input type="text" class="form-control" data-cid="source_amazon_url" placeholder="Amazon Price URL">
+                </div>
+            </div>
+            <a class="btn btn-success" href="#" data-cid="save" style="width:100%;">Save</a>
+        </form>
+    </script>
+    <script id="template-product" type="text/template">
+        <li class="list-group-item" style="overflow: hidden;" data-value="{{id}}">
+            <div style="height: 120px;">
+                <img class="product-poster" src="{{poster}}" style="width: 100%;position: absolute;left: 0px;top: 0px;" onload="product_poster_load(this)" />
+                <div style="position: absolute;z-index: 1;left: 0px;padding-left: 10px;width: 100%;color: #fff;background-color: #000;opacity: 0.6;">
+                    <div style="height: 40px;">{{title}}</div>
+                    <div><small>JD: {{jd_tracker.code}}</small></div>
+                    <div><small>TM: {{tmall_tracker.code}}</small></div>
+                    <div><small>AM: {{amazon_tracker.code}}</small></div>
+                    <div style="margin-right: 5px;text-align: right;color: #e34a33;font-size: 16px;">
+                        <span class="glyphicon glyphicon-list-alt product-edit" data-cid="edit" aria-hidden="true"></span>
+                        <span class="glyphicon glyphicon-trash product-delete" data-cid="delete" aria-hidden="true"></span>
+                    </div>
+                </div>
+            </div>
+        </li>
+    </script>
+    <script id="template-alert" type="text/template">
+        <div class="alert alert-danger alert-dismissible fade in" role="alert">
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">×</span></button>
+            <strong>{{title}}</strong> {{text}}
+        </div>
+    </script>
+    <script type="text/javascript">
+    var TrackerModel = Backbone.Model.extend({
+        defaults: {
+            url: null,
+            code: null
+        }
+    });
+    var ProductModel = Backbone.Model.extend({
+        defaults: function(){
+            var now = (new Date());
+            return {
+                id: 'P{seed}'.replace('{seed}', now.getTime()),
+                title: null,
+                tags: [],
+                poster: null,
+                content: null,
+                jd_tracker: new TrackerModel(),
+                tmall_tracker: new TrackerModel(),
+                amazon_tracker: new TrackerModel(),
+                creator: 'admin',
+                createtime: now,
+                updatetime: now
+            };
+        },
+        toJSON: function(){
+            return {
+                id: this.id,
+                title: this.get('title'),
+                tags: this.get('tags'),
+                poster: this.get('poster'),
+                content: this.get('content'),
+                jd_tracker: this.get('jd_tracker').toJSON(),
+                tmall_tracker: this.get('tmall_tracker').toJSON(),
+                amazon_tracker: this.get('amazon_tracker').toJSON(),
+                creator: this.get('content'),
+                createtime: this.get('createtime'),
+                updatetime: this.get('updatetime')
+            };
+        }
+    });
+    var ProductCollection = Backbone.Collection.extend({
+        model: function(){
+            return new ProductModel();
+        },
+        //localStorage: new Backbone.LocalStorage("when.product"),
+        comparator: 'updatetime'
+    });
+    </script>
+    <script type="text/javascript">
+    var ProductEditView = Backbone.View.extend({
+        template: Handlebars.compile($("#template-edit").html()),
+        events: {
+            'click [data-cid=save]': 'save'
+        },
+        initialize: function(options) {
+            this.setElement(options.root);
+            this._app = options.app;
+        },
+        render: function(model) {
+            this.model = model;
+            this.$el.html(this.template(this.model.toJSON()));
+            this.$('[data-cid=tags]').tagsinput({});
+
+            return this;
+        },
+        save: function() {
+            this.model.id = this.$('[data-cid=id]').val();
+            this.model.set('title', this.$('[data-cid=title]').val());
+            this.model.set('tags', this.$('[data-cid=tags]').tagsinput('items'));
+            this.model.set('poster', this.$('[data-cid=poster]').val());
+            this.model.set('content', this.$('[data-cid=content]').val());
+            this.model.get('jd_tracker').set('url', this.$('[data-cid=source_jd_url]').val());
+            this.model.get('tmall_tracker').set('url', $('[data-cid=source_tmall_url]').val());
+            this.model.get('amazon_tracker').set('url', $('[data-cid=source_amazon_url]').val());
+            if(this.model.get('jd_tracker').get('url')) {
+                var uri_jd = new URI(this.model.get('jd_tracker').get('url'));
+                this.model.get('jd_tracker').set('code', uri_jd.filename(true).split('.')[0]);
+            }
+            if(this.model.get('tmall_tracker').get('url')) {
+                var uri_tmall = new URI(this.model.get('tmall_tracker').get('url'));
+                this.model.get('tmall_tracker').set('code', uri_tmall.search(true).id);
+            }
+            if(this.model.get('amazon_tracker').get('url')) {
+                var uri_amazon = new URI(this.model.get('amazon_tracker').get('url'));
+                this.model.get('amazon_tracker').set('code', uri_amazon.directory(true).match(/[A-Z0-9]{10}/)[0]);
+            }
+            
+            this.collection.create(this.model);
+            this._app.tip({title: '保存成功', text: this.model.get('title')});
+        }
+    });
+    var ProductView = Backbone.View.extend({
+        template: Handlebars.compile($("#template-product").html()),
+        events: {
+            'click [data-cid=edit]': 'edit',
+            'click [data-cid=delete]': 'delete'
+        },
+        initialize: function(options) {
+            this._app = options.app;
+            
+            this.listenTo(this.model, 'change', this.review);
+        },
+        render: function() {
+            // this.el = this.template(this.model.toJSON());
+            this.$el.html(this.template(this.model.toJSON()));
+            
+            return this;
+        },
+        edit: function() {
+            this._app.edit(this.model);
+        },
+        delete: function() {
+            this.model.destroy();
+            this.$el.remove();
+            this._app.tip({title: '删除成功', text: this.model.get('title')});
+        },
+        review: function() {
+            this.$el.replaceWith(this.template(this.model.toJSON()));
+        }
+    });
+    var AlertView = Backbone.View.extend({
+        tagName:  "div",
+        template: Handlebars.compile($("#template-alert").html()),
+        events: {
+        },
+        initialize: function() {
+        },
+        render: function() {
+        }
+    });
+    var AppView = Backbone.View.extend({
+        events: {
+        },
+        initialize: function() {
+            this.setElement($('body'));
+            
+            this.$counter = this.$('#product-count');
+            this.$editor = this.$('#product-edit');
+            this.$list = this.$('#product-list');
+            this.$alert = this.$('#alert-content');
+            
+            this._data = {
+                product: new ProductCollection()
+            };
+            this._template = {
+                alert: Handlebars.compile($("#template-alert").html())
+            };
+            
+            this.listenTo(this._data.product, 'add', this.addOne);
+            this.listenTo(this._data.product, 'reset', this.addAll);
+            this.listenTo(this._data.product, 'all', this.render);
+            
+            this.editor = new ProductEditView({collection: this._data.product, root: this.$editor, app: this});
+            
+            // this._data.product.fetch();
+            
+            this.edit(new ProductModel());
+        },
+        render: function() {
+            this.$counter.text(this._data.product.length);
+        },
+        tip: function(option) {
+            this.$alert.html(this._template.alert(option));
+        },
+        edit: function(model) {
+            this.editor.render(model);
+        },
+        addOne: function(item) {
+            var view = new ProductView({model: item, app: this});
+            this.$list.append(view.render().el);
+        },
+        addAll: function() {
+            this._data.product.each(this.addOne, this);
+        }
+    });
+    </script>
+    <script type="text/javascript">    /*
+        var store = {
+            product: {
+                default: function(){
+                    var now = (new Date());
+                    return {
+                        id: 'P{seed}'.replace('{seed}', now.getTime()),
+                        title: null,
+                        tags: [],
+                        poster: null,
+                        content: null,
+                        tracker: {
+                            jd: {url: null, code: null},
+                            tmall: {url: null, code: null},
+                            amazon: {url: null, code: null}
+                        },
+                        creator: 'admin',
+                        createtime: now,
+                        updatetime: now
+                    };
+                },
+                list: function(callback){
+                    var data = [];
+                    localforage.iterate(function(value, key, index){
+                        if(key.substr(0, 1) === 'P'){
+                            data.push(value);
+                        }
+                    }, function(error){
+                        if(!error){
+                            callback(null, data);
+                        }
+                    });
+                },
+                get: function(id, callback){
+                    localforage.getItem(id, callback);
+                },
+                create: function(item, callback){
+                    localforage.setItem(item.id, item, callback);
+                },
+                update: function(item, callback){
+                    localforage.setItem(item.id, item, callback);
+                },
+                delete: function(id, callback){
+                    localforage.removeItem(id, callback);
+                }
+            }
+        };
+        */
+        $(function(){
+            window.product_poster_load = function(img){
+                $(img).css('top', -1 * ($(img).height() - 120) / 2);
+            };
+            
+            var app = new AppView();
+            /*
+            var template_alert = Handlebars.compile($("#template-alert").html());
+            var template_product = Handlebars.compile($("#template-product").html());
+            var product_edit = function(){
+                var el = $(this).parents('li.list-group-item');
+                store.product.get(el.attr('data-value'), function(error, result){
+                    $('#id').val(result.id);
+                    $('#title').val(result.title);
+                    $('#tags').tagsinput('removeAll');
+                    _.each(result.tags, function(item, index){
+                        $('#tags').tagsinput('add', item);
+                    });
+                    $('#poster').val(result.poster);
+                    $('#content').val(result.content);
+                    $('#source_jd_url').val(result.tracker.jd.url);
+                    $('#source_tmall_url').val(result.tracker.tmall.url);
+                    $('#source_amazon_url').val(result.tracker.amazon.url);
+                });
+            };
+            var product_delete = function(){
+                var el = $(this).parents('li.list-group-item');
+                store.product.delete(el.attr('data-value'), function(error, result){
+                    $('#alert-content').html(template_alert({title: '删除成功', text: el.attr('data-value')}));
+                    el.remove();
+                });
+            };
+            var append_product_view = function(product){
+                var el = $(template_product(product));
+                el.find('.product-poster').on('click', product_edit);
+                el.find('.product-edit').on('click', product_edit);
+                el.find('.product-delete').on('click', product_delete);
+                var view = $('#product-list').find('li[data-value='+product.id+']');
+                if(view.length === 0){
+                    $('#product-list').append(el);
+                } else {
+                    view.replaceWith(el);
+                }
+            };
+            
+
+            // http://item.jd.com/%s.html
+            // http://detail.tmall.com/item.htm?id=%s
+            // http://amazon.cn/gp/product/%s
+            // http://item.jd.com/10063657639.html
+            // http://world.tmall.com/item/520630507180.htm?spm=a2156.7704113.1998547360.16.emjXdR&id=520630507180
+            // http://www.amazon.cn/dp/B00Y2AP9KK/ref=gwgfloorv1_DI_a_1?pf_rd_p=257929632&pf_rd_s=desktop-3&pf_rd_t=36701&pf_rd_i=desktop&pf_rd_m=A1AJ19PSB66TGU&pf_rd_r=0HD5VXB8A2C1TZNVS4KK
+            $('#save').on('click', function(){
+                var product = store.product.default();
+                product.id = $('#id').val() || product.id;
+                product.title = $('#title').val();
+                product.tags = $('#tags').tagsinput('items');
+                product.poster = $('#poster').val();
+                product.content = $('#content').val();
+                product.tracker.jd.url = $('#source_jd_url').val();
+                product.tracker.tmall.url = $('#source_tmall_url').val();
+                product.tracker.amazon.url = $('#source_amazon_url').val();
+                if(product.tracker.jd.url){
+                    product.tracker.jd.code = product.tracker.jd.url.match(/[0-9]+\.html/gim)[0].replace('.html','');
+                }
+                if(product.tracker.tmall.url){
+                    product.tracker.tmall.code = product.tracker.tmall.url.match(/id=[0-9]+/gim)[0].replace('id=','');
+                }
+                if(product.tracker.amazon.url){
+                    product.tracker.amazon.code = product.tracker.amazon.url.match(/dp\/[0-9A-Z]+/gim)[0].replace('dp/','');
+                }
+                
+                store.product.create(product, function(error, result){
+                    $('#alert-content').html(template_alert({title: '保存成功', text: result.title}));
+                    
+                    append_product_view(result);
+                    
+                    $('#id').val('');
+                    $('#title').val('');
+                    $('#tags').tagsinput('removeAll');
+                    $('#poster').val('');
+                    $('#content').val('');
+                    $('#source_jd_url').val('');
+                    $('#source_tmall_url').val('');
+                    $('#source_amazon_url').val('');
+                });
+            });
+            $('#sync').on('click', function(){
+                store.product.list(function(error, result){
+                    $('#alert-content').html(template_alert({title: '数据内容', text: JSON.stringify(result)}));
+                });
+            });
+            
+            store.product.list(function(error, result){
+                _.each(result, function(item, index){
+                    append_product_view(item);
+                });
+            });
+            */
+        });
+    </script>
+</head>
+
+<body style="overflow: hidden;">
+    <nav class="navbar navbar-default">
+        <div class="container-fluid">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1"
+                aria-expanded="false">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="#" style="color: #00A6F0;font-weight: bold;font-size: 22px;">WHEN</a>
+            </div>
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                <ul class="nav navbar-nav">
+                    <li><a href="#">Create Product</a></li>
+                </ul>
+                <ul class="nav navbar-nav navbar-right">
+                    <li>
+                        <a href="#">
+                            <i class="fa fa-heart-o"></i>
+                            <small id="product-count" style=""></small>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" style="padding-right: 0px;">
+                            <span style="font-size: 14px;font-weight: bold;">Hui LIU</span>
+                            <img src="/images/avatar.png" class="img-circle">
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    <div class="container" style="">
+        <div class="row">
+            <div id="product-edit" class="col-md-9">
+            </div>
+            <div class="col-md-3">
+                <ul id="product-list" class="list-group" style="">
+                    <li class="list-group-item"><a id="sync" href="#" class="btn btn-primary" style="width:100%;">Sync</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div style="position: fixed;bottom: 0px;width: 100%;">
+        <div class="container" style="opacity: 0.95;">
+            <div class="row">
+                <div id="alert-content" class="col-md-12"></div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

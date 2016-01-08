@@ -3,11 +3,15 @@ var ENUM_PRODUCT_SOURCE = require('../helpers/global').ENUM_PRODUCT_SOURCE;
 
 var ProductSchema = new mongoose.Schema({
     title: { type: String, required: true },
+    poster: { type: String, required: true },
     content: { type: String, default: '' },
     creator: { type: String, required: true },
     createtime: { type: Date, required: true, default: Date.now },
     updatetime: { type: Date, required: true, default: Date.now }
 }, { collection: 'product' });
+ProductSchema.static('findByPId', function (pid, callback) {
+    return this.find({ _id: pid }, callback);
+});
 ProductSchema.static('findAll', function (callback) {
     return this.find(callback);
 });
@@ -40,7 +44,7 @@ var ProductPriceSchema = new mongoose.Schema({
 }, { collection: 'productprice' })
 ProductPriceSchema.static('findByPId', function (pid, callback) {
     return this.find({ pid: pid })
-        .select('source code datetime price usetime')
+        // .select('source code datetime price usetime')
         .exec(callback);
 });
 ProductPriceSchema.static('getJDLatest', function (pid, callback) {

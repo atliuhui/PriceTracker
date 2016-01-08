@@ -15,6 +15,29 @@ body{
     width: 100%;
     height: 100%;
 }
+.navbar{
+    min-height: 40px !important;
+    border-radius: 0px !important;
+}
+.navbar-brand{
+    height: 40px !important;
+    padding:10px 15px !important;
+    text-transform: uppercase;
+}
+.navbar-nav > li > a {
+    height: 40px !important;
+    padding-top: 10px !important;
+    padding-bottom: 10px !important;
+}
+.nav>li>a>img{
+    margin-top: -8px;
+     width: 36px;
+    height: 36px;
+}
+.navbar-form{
+    margin-top: 3px !important;
+  margin-bottom: 3px !important;
+}
 article{
     margin: 15px;
 }
@@ -37,6 +60,7 @@ article section.index ul.tag > li {
  border: 1px #777 solid;
  color: #333;
  padding: 4px;
+ margin-right: 5px;
  margin-bottom: 5px;
  font-size: 12px;
   border-radius: 4px;
