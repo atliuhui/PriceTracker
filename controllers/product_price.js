@@ -13,8 +13,18 @@ var tmall_price = require('./partial/tmall_price.js');
 
 var DICT_PRODUCT_SOURCE = require('../helpers/global').DICT_PRODUCT_SOURCE;
 var USER_SYSTEM = require('../helpers/global').USER_SYSTEM;
+var DICT_CODE = require('../helpers/global').DICT_CODE;
 
-module.exports.getProductPrice = function (callback, params) {
+module.exports.index = function (callback, params) {
+    Product.findAll(function (error, results) {
+        if (error) {
+            callback(new Error(error));
+        } else {
+            callback(null, {items: results});
+        }
+    });
+};
+module.exports.get = function (callback, params) {
     var begintime = new Date();
     async.auto({
         product: function (next) {
@@ -80,12 +90,79 @@ module.exports.getProductPrice = function (callback, params) {
     });
 };
 
+module.exports.importPrice = function (callback, params) {
+    async.each(params.data, function(item, next) {
+        Product.create([
+            {
+                title: item.title,
+                tags: item.tags,
+                poster: item.poster,
+                content: item.content,
+                creator: USER_SYSTEM
+            }
+        ], function (error) {
+            var product = arguments[1][0];
+            if (error) {
+                logger.error('[CODE]320: ', error);
+                next(new Error('320'));
+            } else {
+                ProductTracker.create([
+                    {
+                        pid: product.id,
+                        source: DICT_PRODUCT_SOURCE.jd,
+                        url: item.jd_url,
+                        code: item.jd_code,
+                        creator: USER_SYSTEM
+                    }, {
+                        pid: product.id,
+                        source: DICT_PRODUCT_SOURCE.tmall,
+                        url: item.tmall_url,
+                        code: item.tmall_code,
+                        creator: USER_SYSTEM
+                    }, {
+                        pid: product.id,
+                        source: DICT_PRODUCT_SOURCE.amazon,
+                        url: item.amazon_url,
+                        code: item.amazon_code,
+                        creator: USER_SYSTEM
+                    }
+                ], function (error2) {
+                    if (error2) {
+                        logger.error('[CODE]321: ', error2);
+                        next(new Error('321'));
+                    } else {
+                        next(null, product);
+                    }
+                });
+            }
+        });
+    }, function (error, results) {
+        if (error) {
+            logger.error('[CODE]322: ', error);
+            callback(new Error('322'));
+        } else {
+            callback(null, {code: DICT_CODE['210']});
+        }
+    });
+};
+
+module.exports.getPrice = function (callback, params) {
+    ProductPrice.findByPId(params.pid, function (error, prices) {
+        if (error) {
+            logger.error('[CODE]316: ', error);
+            callback(new Error('316'));
+        } else {
+            callback(null, prices);
+        }
+    });
+};
+
 module.exports.loadProductPrice = function (callback, params) {
     var begintime = new Date();
     async.auto({
         default: function (next) {
             var pid = params.pid;
-            ProductTracker.findByPId({ pid: pid }, function (error, trackers) {
+            ProductTracker.findByPId(pid, function (error, trackers) {
                 if (error) {
                     logger.error('[CODE]314: ', error);
                     callback(new Error('314'));
@@ -140,17 +217,6 @@ module.exports.loadProductPrice = function (callback, params) {
 
             logger.debug(value);
             callback(null, value);
-        }
-    });
-};
-
-module.exports.getProductPriceHistory = function (callback, params) {
-    ProductPrice.findByPId(params.pid, function (error, prices) {
-        if (error) {
-            logger.error('[CODE]316: ', error);
-            callback(new Error('316'));
-        } else {
-            callback(null, prices);
         }
     });
 };

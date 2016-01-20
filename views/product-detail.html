@@ -3,13 +3,6 @@
 <script type="text/javascript" src="/javascripts/d3/d3.min.js"></script>
 <script type="text/javascript" src="/javascripts/highcharts/highcharts.js"></script>
 <script type="text/javascript">
-// Highcharts.setOptions({
-// 	lang: {
-// 		months: ['一月', '二月', '三月', '四月', '五月', '六月', '七月', '八月', '九月', '十月', '十一月', '十二月'],
-// 		shortMonths: ['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月'],
-// 		weekdays: ['周日', '周一', '周二', '周三', '周四', '周五', '周六']
-// 	}
-// });
 $(function(){
     var pid = '{{data.product.id}}';
 	var option = {
@@ -65,7 +58,7 @@ $(function(){
     if(pid){
 	$.ajax({
 		type: 'GET',
-		url: '/product/{pid}/history'.replace(/{pid}/g, pid),
+		url: '/product/{pid}/price'.replace(/{pid}/g, pid),
 		dataType: 'json',
 		success: function (data) {
 			var dataset = crossfilter(data);
@@ -131,8 +124,8 @@ $(function(){
 </script>
 <div class="container" style="opacity: 0.95;">
     <header></header>
-	<div class="row">
-		<div class="col-md-12">
+    <div class="row">
+        <div class="col-md-12">
             <div id="container" style="background-color: #fff;">
                 <div class="row">
                     <div class="col-md-12">
@@ -155,8 +148,7 @@ $(function(){
                             </div>
                         </div>
                     </div>
-                    {{/if}}
-                    {{#if data.tmall}}
+                    {{/if}} {{#if data.tmall}}
                     <div class="col-md-4">
                         <div class="card">
                             <div class="property">
@@ -173,8 +165,7 @@ $(function(){
                             </div>
                         </div>
                     </div>
-                    {{/if}}
-                    {{#if data.amazon}}
+                    {{/if}} {{#if data.amazon}}
                     <div class="col-md-4">
                         <div class="card">
                             <div class="property">
@@ -199,8 +190,8 @@ $(function(){
                     </div>
                 </div>
             </div>
-		</div>
-	</div>
+        </div>
+    </div>
     <footer>
         <h5>usetime:{{data.allusetime}}</h5>
     </footer>

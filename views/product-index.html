@@ -1,0 +1,14 @@
+<div class="container" style="background-color: #fff;opacity: 0.95;">
+    <header></header>
+    <div class="row">
+        {{#each data.items}}
+        <div class="col-md-4">
+            <div>{{title}}</div>
+            <div>{{poster}}</div>
+            <div>{{updatetime}}</div>
+            <a class="btn btn-default" href="/product/{{_id}}">SHOW</a>
+        </div>
+        {{/each}}
+    </div>
+    <footer></footer>
+</div>

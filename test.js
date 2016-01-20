@@ -52,7 +52,7 @@ var productPrice = require('./controllers/product_price');
 //     logger.fatal('Cheese was breeding ground for listeria.');
 // }
 
-productPrice.getProductPriceHistory(function (error, results) {
+productPrice.getProductPrice(function (error, results) {
     var a = results;
 }, { pid: '566e32b7b642d69c074e23b3' });
 

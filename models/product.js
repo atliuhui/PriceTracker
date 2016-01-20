@@ -3,8 +3,9 @@ var ENUM_PRODUCT_SOURCE = require('../helpers/global').ENUM_PRODUCT_SOURCE;
 
 var ProductSchema = new mongoose.Schema({
     title: { type: String, required: true },
+    tags: { type: Array, required: false, default: [] },
     poster: { type: String, required: true },
-    content: { type: String, default: '' },
+    content: { type: String, required: false, default: '' },
     creator: { type: String, required: true },
     createtime: { type: Date, required: true, default: Date.now },
     updatetime: { type: Date, required: true, default: Date.now }
