@@ -25,7 +25,9 @@ module.exports.get = function (callback, results) {
                 // var content = iconv.decode(body, 'UTF8');
                 var $ = cheerio.load(body);
                 
-                var price = $('#priceblock_ourprice').text().replace(/￥/g, '').replace(/,/g, '').trim();
+                var price = $('#priceblock_ourprice').text().replace(/￥/g, '').replace(/,/g, '').trim()
+                    || $('#priceblock_saleprice').text().replace(/￥/g, '').replace(/,/g, '').trim()
+                    || 0;
 
                 logger.debug('get amazon price, %j, %d', results.default.amazon, price);
                 callback(null, {
