@@ -111,19 +111,19 @@ module.exports.importPrice = function (callback, params) {
                         pid: product.id,
                         source: DICT_PRODUCT_SOURCE.jd,
                         url: item.jd_url,
-                        code: item.jd_code,
+                        key: item.jd_key,
                         creator: USER_SYSTEM
                     }, {
                         pid: product.id,
                         source: DICT_PRODUCT_SOURCE.tmall,
                         url: item.tmall_url,
-                        code: item.tmall_code,
+                        key: item.tmall_key,
                         creator: USER_SYSTEM
                     }, {
                         pid: product.id,
                         source: DICT_PRODUCT_SOURCE.amazon,
                         url: item.amazon_url,
-                        code: item.amazon_code,
+                        key: item.amazon_key,
                         creator: USER_SYSTEM
                     }
                 ], function (error2) {
@@ -131,12 +131,18 @@ module.exports.importPrice = function (callback, params) {
                         logger.error('[CODE]321: ', error2);
                         next(new Error('321'));
                     } else {
-                        next(null, product);
+                        module.exports.recordProductPrice(function (error3, results) {
+                            if (error3) {
+                                next(new Error(error3));
+                            } else {
+                                next(null);
+                            }
+                        }, { pid: product.id });
                     }
                 });
             }
         });
-    }, function (error, results) {
+    }, function (error) {
         if (error) {
             logger.error('[CODE]322: ', error);
             callback(new Error('322'));
@@ -172,13 +178,13 @@ module.exports.loadProductPrice = function (callback, params) {
                     _.each(trackers, function (item, index) {
                         switch (item.source) {
                             case DICT_PRODUCT_SOURCE.jd:
-                                value.jd = item.code;
+                                value.jd = item.key;
                                 break;
                             case DICT_PRODUCT_SOURCE.tmall:
-                                value.tmall = item.code;
+                                value.tmall = item.key;
                                 break;
                             case DICT_PRODUCT_SOURCE.amazon:
-                                value.amazon = item.code;
+                                value.amazon = item.key;
                                 break;
                             default:
                                 break;
@@ -208,9 +214,9 @@ module.exports.loadProductPrice = function (callback, params) {
                 amazon: results.amazon,
                 allusetime: (datetime.getTime() - begintime.getTime())
             };
-            value.jd.code = results.default.jd;
-            value.tmall.code = results.default.tmall;
-            value.amazon.code = results.default.amazon;
+            value.jd.key = results.default.jd;
+            value.tmall.key = results.default.tmall;
+            value.amazon.key = results.default.amazon;
             value.jd.datetime = datetime;
             value.tmall.datetime = datetime;
             value.amazon.datetime = datetime;
@@ -231,7 +237,7 @@ module.exports.recordProductPrice = function (callback, params) {
                 {
                     pid: results.product.pid,
                     source: DICT_PRODUCT_SOURCE.jd,
-                    code: results.jd.code,
+                    key: results.jd.key,
                     price: results.jd.price,
                     usetime: results.jd.usetime,
                     datetime: results.jd.datetime,
@@ -239,7 +245,7 @@ module.exports.recordProductPrice = function (callback, params) {
                 }, {
                     pid: results.product.pid,
                     source: DICT_PRODUCT_SOURCE.tmall,
-                    code: results.tmall.code,
+                    key: results.tmall.key,
                     price: results.tmall.price,
                     usetime: results.tmall.usetime,
                     datetime: results.tmall.datetime,
@@ -247,7 +253,7 @@ module.exports.recordProductPrice = function (callback, params) {
                 }, {
                     pid: results.product.pid,
                     source: DICT_PRODUCT_SOURCE.amazon,
-                    code: results.amazon.code,
+                    key: results.amazon.key,
                     price: results.amazon.price,
                     usetime: results.amazon.usetime,
                     datetime: results.amazon.datetime,

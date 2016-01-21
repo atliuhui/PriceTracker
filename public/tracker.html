@@ -77,9 +77,9 @@
                 />
                 <div style="position: absolute;z-index: 1;left: 0px;padding-left: 10px;width: 100%;color: #fff;background-color: #000;opacity: 0.6;">
                     <div style="height: 40px;">{{title}}</div>
-                    <div><small>JD: {{jd_code}}</small></div>
-                    <div><small>TM: {{tmall_code}}</small></div>
-                    <div><small>AM: {{amazon_code}}</small></div>
+                    <div><small>JD: {{jd_key.code}}</small></div>
+                    <div><small>TM: {{tmall_key.code}},{{tmall_key.skuid}}</small></div>
+                    <div><small>AM: {{amazon_key.code}}</small></div>
                     <div style="margin-right: 5px;text-align: right;color: #e34a33;font-size: 16px;">
                         <span class="glyphicon glyphicon-list-alt product-edit" data-cid="edit" aria-hidden="true"></span>
                         <span class="glyphicon glyphicon-trash product-delete" data-cid="delete" aria-hidden="true"></span>
@@ -106,11 +106,11 @@
                 poster: null,
                 content: null,
                 jd_url: null,
-                jd_code: null,
+                jd_key: null,
                 tmall_url: null,
-                tmall_code: null,
+                tmall_key: null,
                 amazon_url: null,
-                amazon_code: null,
+                amazon_key: null,
                 creator: 'admin',
                 createtime: now.getTime(),
                 updatetime: now.getTime()
@@ -128,15 +128,15 @@
         parseURL: function() {
             if(this.get('jd_url')) {
                 var uri_jd = new URI(this.get('jd_url'));
-                this.set('jd_code', uri_jd.filename(true).split('.')[0]);
+                this.set('jd_key', {code: uri_jd.filename(true).split('.')[0]});
             }
             if(this.get('tmall_url')) {
                 var uri_tmall = new URI(this.get('tmall_url'));
-                this.set('tmall_code', uri_tmall.search(true).id);
+                this.set('tmall_key', {code: uri_tmall.search(true).id, skuid: uri_tmall.search(true)['skuId']});
             }
             if(this.get('amazon_url')) {
                 var uri_amazon = new URI(this.get('amazon_url'));
-                this.set('amazon_code', uri_amazon.directory(true).match(/[A-Z0-9]{10}/)[0]);
+                this.set('amazon_key', {code: uri_amazon.directory(true).match(/[A-Z0-9]{10}/)[0]});
             }
         },
         sync: Backbone.localforage.sync('Product')
@@ -296,17 +296,29 @@
         demo: function() {
             var item = new ProductModel({
                 title: '【示例】贝尔金车载充电器2.1A',
-                tags: ['BELKIN'],
+                tags: ['BELKIN', '2.1A'],
                 poster: 'https://img.alicdn.com/bao/uploaded/i5/T1cIeqFhpdXXca8bwU_014011.jpg_430x430q90.jpg',
                 content: '',
-                jd_url: 'http://item.jd.com/850959.html',
+                jd_url: 'http://item.jd.com/1492748.html',
                 tmall_url: 'https://detail.tmall.com/item.htm?spm=a220m.1000858.0.0.veyBqP&id=22575428503&skuId=76280448023&is_b=1&cat_id=2&q=%B1%B4%B6%FB%BD%F0+2.1+a',
                 amazon_url: 'http://www.amazon.cn/Belkin-%E8%B4%9D%E5%B0%94%E9%87%91-iphone5%E8%BD%A6%E5%85%85-ipad-mini%E8%BD%A6%E8%BD%BD%E5%85%85%E7%94%B5%E5%99%A8-2-1A-F8J051-%E7%99%BD%E8%89%B2/dp/B00BONRSEI/ref=sr_1_7?ie=UTF8&qid=1452065963&sr=8-7&keywords=BELKIN+2.1A#nav-belt',
             });
             item.parseURL();
             item.newId();
-            
             this._data.product.create(item);
+            
+            var item2 = new ProductModel({
+                title: '【示例】Apple MacBook Air 13.3英寸笔记本电脑',
+                tags: ['Apple', 'MacBook Air', '13.3英寸', 'Core i5 处理器', '4GB内存', '128GB SSD闪存 MJVE2CH/A'],
+                poster: 'http://ec4.images-amazon.com/images/I/61oS%2ByxexLL._SX522_.jpg',
+                content: '',
+                jd_url: 'http://item.jd.com/1378538.html',
+                tmall_url: 'https://detail.tmall.com/item.htm?spm=a220m.1000858.1000725.6.NqI3NE&id=44130865295&cat_id=2&rn=468c82726a1559b31955dbdac9bdf68f&user_id=1917047079&is_b=1',
+                amazon_url: 'http://www.amazon.cn/Apple-MacBook-Air-MJVE2CH-A-13-3%E8%8B%B1%E5%AF%B8%E7%AC%94%E8%AE%B0%E6%9C%AC%E7%94%B5%E8%84%91/dp/B00UKPMIOQ/ref=sr_1_4?ie=UTF8&qid=1453360996&sr=8-4&keywords=Apple+MacBook+Air+13.3',
+            });
+            item2.parseURL();
+            item2.newId();
+            this._data.product.create(item2);
         }
     });
     </script>

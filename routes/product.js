@@ -29,22 +29,29 @@ router.get('/import', function (req, res, next) {
 router.post('/import', function (req, res, next) {
     var form = new formidable.IncomingForm();
     form.parse(req, function(error, fields, files) {
-        product_price.importPrice(function (error, results) {
-            res.render('product-import', {
-                data: {
-                    title: '产品导入',
-                    poster: '/images/FloatingMarket_ZH-CN9326364399_1366x768.jpg',
-                    message: results.code.msg
+        if (error) {
+            next(error);
+        } else {
+            product_price.importPrice(function (error2, results) {
+                if (error2) {
+                    next(error2);
+                } else {
+                    res.render('product-import', {
+                        data: {
+                            title: '产品导入',
+                            poster: '/images/FloatingMarket_ZH-CN9326364399_1366x768.jpg',
+                            message: results.code.msg
+                        }
+                    });
                 }
-            });
-        }, {data: JSON.parse(fields.products)});
+            }, {data: JSON.parse(fields.products)});
+        }
     });
     // var postdata = null;
     // req.on('data', function(data) {
     //     postdata = decodeURIComponent(data);
     // });
     // req.on('end', function() {
-        
     // });
 });
 router.get('/:code', function (req, res, next) {

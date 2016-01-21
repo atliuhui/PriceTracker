@@ -9,7 +9,7 @@ module.exports.ENUM_PRODUCT_SOURCE = [
 	module.exports.DICT_PRODUCT_SOURCE.amazon
 ];
 
-module.exports.DB_URI = 'mongodb://localhost/test';
+module.exports.DB_URI = 'mongodb://localhost/when';
 
 module.exports.USER_SYSTEM = 'admin';
 
