@@ -1,6 +1,6 @@
 var logger = require('./helpers/logging').getLogger('tracker');
 
-var productPrice = require('./controllers/product_price');
+var product = require('./controllers/product');
 
 var nextTime = function () {
 	var now = new Date();
@@ -25,7 +25,7 @@ var timer = function (params) {
 };
 var processer = function (callback, params) {
 	if (params.delay) {
-		productPrice.recordAllProductPrice(function (error, results) {
+		product.recordAllProductPrice(function (error, results) {
 			var time = nextTime();
 			logger.info('Now: %s | Next: %s', time.now.toString(), time.next.toString());
 			callback({ delay: time.delay });

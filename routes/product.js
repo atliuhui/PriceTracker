@@ -1,12 +1,12 @@
 var express = require('express');
 var formidable = require('formidable');
 
-var product_price = require('../controllers/product_price.js');
+var product = require('../controllers/product.js');
 
 var router = express.Router();
 
 router.get('/', function (req, res, next) {
-    product_price.index(function (error, results) {
+    product.index(function (error, results) {
         if (error) {
             next(error);
         } else {
@@ -32,7 +32,7 @@ router.post('/import', function (req, res, next) {
         if (error) {
             next(error);
         } else {
-            product_price.importPrice(function (error2, results) {
+            product.importPrice(function (error2, results) {
                 if (error2) {
                     next(error2);
                 } else {
@@ -54,8 +54,39 @@ router.post('/import', function (req, res, next) {
     // req.on('end', function() {
     // });
 });
+router.get('/test', function (req, res, next) {
+    res.render('product-import-test', {
+        data: {
+            title: '导入测试',
+            poster: '/images/FloatingMarket_ZH-CN9326364399_1366x768.jpg'
+        }
+    });
+});
+router.post('/test', function (req, res, next) {
+    var form = new formidable.IncomingForm();
+    form.parse(req, function(error, fields, files) {
+        if (error) {
+            next(error);
+        } else {
+            product.testPrice(function (error2, results) {
+                if (error2) {
+                    next(error2);
+                } else {
+                    res.render('product-import-test', {
+                        data: {
+                            title: '导入测试',
+                            json: fields.products,
+                            poster: '/images/FloatingMarket_ZH-CN9326364399_1366x768.jpg',
+                            message: results.code.msg
+                        }
+                    });
+                }
+            }, {data: JSON.parse(fields.products)});
+        }
+    });
+});
 router.get('/:code', function (req, res, next) {
-    product_price.get(function (error, results) {
+    product.get(function (error, results) {
         if (error) {
             next(error);
         } else {
@@ -69,7 +100,7 @@ router.get('/:code', function (req, res, next) {
     }, { pid: req.param('code') });
 });
 router.get('/:code/price', function (req, res, next) {
-    product_price.getPrice(function (error, results) {
+    product.getPrice(function (error, results) {
         if (error) {
             next(error);
         } else {

@@ -5,11 +5,11 @@ var iconv = require('iconv-lite');
 
 var logger = require('../../helpers/logging').getLogger('price-jd');
 
-module.exports.get = function (callback, results) {
-    if (results && results.default && results.default.jd) {
+module.exports.get = function (callback, params) {
+    if (params && params.default && params.default.jd) {
         request({
-            // uri: util.format('http://item.jd.com/%s.html', results.default.jd.code),
-            uri: util.format('http://p.3.cn/prices/get?skuid=J_%s', results.default.jd.code),
+            // uri: util.format('http://item.jd.com/%s.html', params.default.jd.code),
+            uri: util.format('http://p.3.cn/prices/get?skuid=J_%s', params.default.jd.code),
             method: 'GET',
             // encoding: null,
             time: true,
@@ -26,7 +26,7 @@ module.exports.get = function (callback, results) {
                 // var $ = cheerio.load(content);
                 var price = JSON.parse(body)[0].p;
 
-                logger.debug('get jd price, %j, %d', results.default.jd, price);
+                logger.debug('get jd price, %j, %d', params.default.jd, price);
                 callback(null, {
                     usetime: response.elapsedTime,
                     price: price

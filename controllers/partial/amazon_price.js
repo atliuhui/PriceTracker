@@ -5,11 +5,11 @@ var iconv = require('iconv-lite');
 
 var logger = require('../../helpers/logging').getLogger('price-amazon');
 
-module.exports.get = function (callback, results) {
-    if (results && results.default && results.default.amazon) {
+module.exports.get = function (callback, params) {
+    if (params && params.default && params.default.amazon) {
         request({
-            // uri:util.format('http://amazon.cn/dp/%s.html',results.default.amazon.code),
-            uri: util.format('http://www.amazon.cn/gp/product/%s', results.default.amazon.code),
+            // uri:util.format('http://amazon.cn/dp/%s.html',params.default.amazon.code),
+            uri: util.format('http://www.amazon.cn/gp/product/%s', params.default.amazon.code),
             method: 'GET',
             // encoding: null,
             time: true,
@@ -29,7 +29,7 @@ module.exports.get = function (callback, results) {
                     || $('#priceblock_saleprice').text().replace(/￥/g, '').replace(/,/g, '').trim()
                     || 0;
 
-                logger.debug('get amazon price, %j, %d', results.default.amazon, price);
+                logger.debug('get amazon price, %j, %d', params.default.amazon, price);
                 callback(null, {
                     usetime: response.elapsedTime,
                     price: price

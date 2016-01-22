@@ -1,4 +1,4 @@
-var productPrice = require('./controllers/product_price');
+var product = require('./controllers/product');
 
 // var mongoose = require('mongoose');
 // mongoose.connect('mongodb://localhost/test');
@@ -52,7 +52,16 @@ var productPrice = require('./controllers/product_price');
 //     logger.fatal('Cheese was breeding ground for listeria.');
 // }
 
-productPrice.getProductPrice(function (error, results) {
-    var a = results;
-}, { pid: '566e32b7b642d69c074e23b3' });
+// product.getProductPrice(function (error, results) {
+//     var a = results;
+// }, { pid: '566e32b7b642d69c074e23b3' });
 
+var aaa = function() {};
+try {
+    var a;
+    a.setSeconds(0);
+    console.log('%s', a);
+} catch (error) {
+    console.log('%s', '2');
+}
+console.log('%s', '3');
