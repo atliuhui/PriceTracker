@@ -6,8 +6,8 @@ var nextTime = function () {
 	var now = new Date();
 	var next = new Date(now);
 	// next.setMinutes(now.getMinutes() + 1);
-    next.setDate(now.getDate() + 1);
-    next.setHours(0);
+    // next.setDate(now.getDate() + 1);
+    next.setHours(now.getHours() + 1);
     next.setMinutes(0);
 	next.setSeconds(0);
 	next.setMilliseconds(0);
