@@ -66,18 +66,18 @@ $(function(){
 				group = {};
 			dimension.source = dataset.dimension(function(item) { return item.source; });
 			group.source = dimension.source.group().reduce(function(results, item){
-				results._values.push(item.usetime);
+				results._values.push(item.price);
 				results.min = Math.min(Math.min.apply(this, results._values));
 				results.max = Math.max(Math.max.apply(this, results._values));
-				results.sum = parseInt(results.sum + item.usetime);
+				results.sum = parseInt(results.sum + item.price);
 				results.count = parseInt(results.count + 1);
 				results.average = parseInt(results.sum / results.count);
 				return results;
 			}, function(results, item){
-				results._values.splice(_.indexOf(results._values, item.usetime), 1);
+				results._values.splice(_.indexOf(results._values, item.price), 1);
 				results.min = Math.min(Math.min.apply(this, results._values));
 				results.max = Math.max(Math.max.apply(this, results._values));
-				results.sum = parseInt(results.sum - item.usetime);
+				results.sum = parseInt(results.sum - item.price);
 				results.count = parseInt(results.count - 1);
 				results.average = parseInt(results.sum / results.count);
 				return results;
@@ -110,7 +110,7 @@ $(function(){
 					marker: { lineColor: option.colors[index] },
 					// zIndex: source.datas.length - index,
 					data: _.map(dimension.source.filter(group.key).top(Infinity),function(item, index){
-						return [(new Date(item.datetime)).getTime(), item.usetime];
+						return [(new Date(item.datetime)).getTime(), item.price];
 					})
 				};
 			});
