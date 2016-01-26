@@ -1,10 +1,17 @@
+<script type="text/javascript">
+    window.product_poster_load = function(img){
+        $(img).css('top', -1 * ($(img).height() - 200) / 2);
+    };
+</script>
 <div class="container" style="background-color: #fff;opacity: 0.95;">
     <header></header>
     <div class="row">
         {{#each data.items}}
         <div class="col-md-4">
+            <div style="height: 200px; overflow: hidden;">
+                <img class="product-poster" src="{{poster}}" style="width: 100%;position: relative;" onload="product_poster_load(this)" />
+            </div>
             <div>{{title}}</div>
-            <div>{{poster}}</div>
             <div>{{updatetime}}</div>
             <a class="btn btn-default" href="/product/{{_id}}">SHOW</a>
         </div>

@@ -49,15 +49,15 @@
             <div class="form-group">
                 <label>Price URL</label>
                 <div class="input-group">
-                    <div class="input-group-addon">JD</div>
+                    <div class="input-group-addon" style="">JD</div>
                     <input type="text" class="form-control" data-cid="jd_url" value="{{jd_url}}" placeholder="JD URL">
                 </div>
                 <div class="input-group">
-                    <div class="input-group-addon">TM</div>
+                    <div class="input-group-addon" style="">TM</div>
                     <input type="text" class="form-control" data-cid="tmall_url" value="{{tmall_url}}" placeholder="TMall URL">
                 </div>
                 <div class="input-group">
-                    <div class="input-group-addon">AM</div>
+                    <div class="input-group-addon" style="">AM</div>
                     <input type="text" class="form-control" data-cid="amazon_url" value="{{amazon_url}}" placeholder="Amazon URL">
                 </div>
             </div>
@@ -77,9 +77,9 @@
                 />
                 <div style="position: absolute;z-index: 1;left: 0px;padding-left: 10px;width: 100%;color: #fff;background-color: #000;opacity: 0.6;">
                     <div style="height: 40px;">{{title}}</div>
-                    <div><small>JD: {{jd_key.code}}</small></div>
-                    <div><small>TM: {{tmall_key.code}},{{tmall_key.skuid}}</small></div>
-                    <div><small>AM: {{amazon_key.code}}</small></div>
+                    <div><small><img class="favicon grayscale" src="http://www.jd.com/favicon.ico" /> {{jd_key.code}}</small></div>
+                    <div><small><img class="favicon grayscale" src="https://www.tmall.com/favicon.ico" /> {{tmall_key.code}},{{tmall_key.skuid}}</small></div>
+                    <div><small><img class="favicon grayscale" src="http://www.amazon.cn/favicon.ico" /> {{amazon_key.code}}</small></div>
                     <div style="margin-right: 5px;text-align: right;color: #e34a33;font-size: 16px;">
                         <span class="glyphicon glyphicon-list-alt product-edit" data-cid="edit" aria-hidden="true"></span>
                         <span class="glyphicon glyphicon-trash product-delete" data-cid="delete" aria-hidden="true"></span>

@@ -16,7 +16,7 @@ $(function(){
 			type: 'line',
             // width: width,
             // height: height,
-			margin: [0, 0, 30, 0]
+			margin: [1, 10, 30, 30]
         },
         xAxis: {
             tickWidth: 0,
@@ -37,20 +37,18 @@ $(function(){
         yAxis: {
             title: { text: '' },
 			type: 'linear',
-            gridLineWidth: 0,
+            gridLineColor: '#eee',
+            gridLineWidth: 1,
 			min: 0,
             plotLines: [],
-			labels : { enabled: false }
+			labels : { enabled: true }
         },
         plotOptions: {
             line: {
                 enableMouseTracking: false,
                 allowPointSelect: false,
                 lineWidth: 1,
-                marker: {
-                    lineWidth: 0,
-                    radius: 3
-                }
+                marker: { enabled: false }
             }
         }
     };
@@ -90,18 +88,18 @@ $(function(){
             option.xAxis.labels.formatter = function () {
 				return Highcharts.dateFormat('%a', new Date(this.value));
             };
-			_.each(sourceGroup, function(item, index){
-				option.yAxis.plotLines.push({
-					color: '#ccc',
-					value: item.value.max,
-					label: {
-						text: '{value}(MAX)'.replace(/{value}/g, item.key),
-						style: { color: '#ccc' }
-					},
-					dashStyle: 'Dot',
-					width: 1
-				});
-			});
+			// _.each(sourceGroup, function(item, index){
+			// 	option.yAxis.plotLines.push({
+			// 		color: '#ccc',
+			// 		value: item.value.max,
+			// 		label: {
+			// 			text: '{value}(MAX)'.replace(/{value}/g, item.key),
+			// 			style: { color: '#ccc' }
+			// 		},
+			// 		dashStyle: 'Dot',
+			// 		width: 1
+			// 	});
+			// });
 			option.series = _.map(sourceGroup, function (group, index) {
 				return {
 					animation: true,
@@ -135,7 +133,7 @@ $(function(){
                     <div class="col-md-4">
                         <div class="card">
                             <div class="property">
-                                <div class="icon"><i class="fa fa-at"></i></div>
+                                <div class="icon"><img class="favicon grayscale" src="http://www.jd.com/favicon.ico" /></div>
                                 <div class="text">JD</div>
                             </div>
                             <div class="property">
@@ -152,7 +150,7 @@ $(function(){
                     <div class="col-md-4">
                         <div class="card">
                             <div class="property">
-                                <div class="icon"><i class="fa fa-at"></i></div>
+                                <div class="icon"><img class="favicon grayscale" src="https://www.tmall.com/favicon.ico" /></div>
                                 <div class="text">TMALL</div>
                             </div>
                             <div class="property">
@@ -169,7 +167,7 @@ $(function(){
                     <div class="col-md-4">
                         <div class="card">
                             <div class="property">
-                                <div class="icon"><i class="fa fa-at"></i></div>
+                                <div class="icon"><img class="favicon grayscale" src="http://www.amazon.cn/favicon.ico" /></div>
                                 <div class="text">AMAZON</div>
                             </div>
                             <div class="property">
@@ -193,6 +191,6 @@ $(function(){
         </div>
     </div>
     <footer>
-        <h5>usetime:{{data.allusetime}}</h5>
+        <h5 style="display: none;">usetime:{{data.allusetime}}</h5>
     </footer>
 </div>
