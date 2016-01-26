@@ -9,14 +9,14 @@ $(function(){
         title: { text: '' },
         credits: { enabled: false },
         exporting: { enabled: false },
-        legend: { enabled: false },
+        legend: {
+            verticalAlign: 'top'
+        },
         tooltip: { enabled: false },
-        colors: ['#7cb5ec', '#434348', '#90ed7d', '#f7a35c', '#8085e9', '#f15c80', '#e4d354', '#2b908f', '#f45b5b', '#91e8e1'],
+        colors: ['#9ecae1', '#a1d99b', '#fdae6b', '#fc9272', '#bcbddc', '#bdbdbd', '#fff7bc', '#fa9fb5', '#7fcdbb', '#fec44f'],
         chart: {
 			type: 'line',
-            // width: width,
-            // height: height,
-			margin: [1, 10, 30, 30]
+			margin: [40, 10, 30, 30]
         },
         xAxis: {
             tickWidth: 0,
