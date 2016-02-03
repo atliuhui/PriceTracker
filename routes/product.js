@@ -11,7 +11,7 @@ router.get('/', function (req, res, next) {
             next(error);
         } else {
             results.title = '产品列表';
-            results.poster = '/images/FloatingMarket_ZH-CN9326364399_1366x768.jpg';
+            results.poster = '/img/FloatingMarket_ZH-CN9326364399_1366x768.jpg';
             res.render('product-index', {
                 data: results
             });
@@ -22,7 +22,7 @@ router.get('/import', function (req, res, next) {
     res.render('product-import', {
         data: {
             title: '产品导入',
-            poster: '/images/FloatingMarket_ZH-CN9326364399_1366x768.jpg'
+            poster: '/img/FloatingMarket_ZH-CN9326364399_1366x768.jpg'
         }
     });
 });
@@ -39,7 +39,7 @@ router.post('/import', function (req, res, next) {
                     res.render('product-import', {
                         data: {
                             title: '产品导入',
-                            poster: '/images/FloatingMarket_ZH-CN9326364399_1366x768.jpg',
+                            poster: '/img/FloatingMarket_ZH-CN9326364399_1366x768.jpg',
                             message: results.code.msg
                         }
                     });
@@ -58,7 +58,7 @@ router.get('/test', function (req, res, next) {
     res.render('product-import-test', {
         data: {
             title: '导入测试',
-            poster: '/images/FloatingMarket_ZH-CN9326364399_1366x768.jpg'
+            poster: '/img/FloatingMarket_ZH-CN9326364399_1366x768.jpg'
         }
     });
 });
@@ -76,7 +76,7 @@ router.post('/test', function (req, res, next) {
                         data: {
                             title: '导入测试',
                             json: fields.products,
-                            poster: '/images/FloatingMarket_ZH-CN9326364399_1366x768.jpg',
+                            poster: '/img/FloatingMarket_ZH-CN9326364399_1366x768.jpg',
                             message: results.code.msg
                         }
                     });

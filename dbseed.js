@@ -53,7 +53,7 @@ var c1 = '<article>' +
 
 Product.create([{
     title: 'BOX',
-    poster: '/images/FloatingMarket_ZH-CN9326364399_1366x768.jpg',
+    poster: '/img/FloatingMarket_ZH-CN9326364399_1366x768.jpg',
     content: c1,
     creator: USER_SYSTEM
 }], function (error) {

@@ -10,7 +10,7 @@ html, body {
     width: 100%;
 }
 #background-mask {
-    background-image: url(/images/b2x2_2a30.png);
+    background-image: url(/img/b2x2_2a30.png);
     position: fixed;
     top: 0px;
     z-index: -1000;
