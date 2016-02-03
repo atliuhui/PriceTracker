@@ -13,7 +13,7 @@ $(function(){
             verticalAlign: 'top'
         },
         tooltip: { enabled: false },
-        colors: ['#9ecae1', '#a1d99b', '#fdae6b', '#fc9272', '#bcbddc', '#bdbdbd', '#fff7bc', '#fa9fb5', '#7fcdbb', '#fec44f'],
+        colors: ['#9ecae1', '#fdae6b', '#a1d99b', '#bdbdbd', '#bcbddc', '#fff7bc', '#fc9272', '#fa9fb5', '#7fcdbb', '#fec44f'],
         chart: {
 			type: 'line',
 			margin: [40, 10, 30, 30]
@@ -54,68 +54,59 @@ $(function(){
     };
 	
     if(pid){
-	$.ajax({
-		type: 'GET',
-		url: '/product/{pid}/price'.replace(/{pid}/g, pid),
-		dataType: 'json',
-		success: function (data) {
-			var dataset = crossfilter(data);
-			var dimension = {}, 
-				group = {};
-			dimension.source = dataset.dimension(function(item) { return item.source; });
-			group.source = dimension.source.group().reduce(function(results, item){
-				results._values.push(item.price);
-				results.min = Math.min(Math.min.apply(this, results._values));
-				results.max = Math.max(Math.max.apply(this, results._values));
-				results.sum = parseInt(results.sum + item.price);
-				results.count = parseInt(results.count + 1);
-				results.average = parseInt(results.sum / results.count);
-				return results;
-			}, function(results, item){
-				results._values.splice(_.indexOf(results._values, item.price), 1);
-				results.min = Math.min(Math.min.apply(this, results._values));
-				results.max = Math.max(Math.max.apply(this, results._values));
-				results.sum = parseInt(results.sum - item.price);
-				results.count = parseInt(results.count - 1);
-				results.average = parseInt(results.sum / results.count);
-				return results;
-			}, function(){
-				return { min: 0, max: 0, sum: 0, count: 0, average: 0, _values: [] };
-			});
-			
-			var sourceGroup = group.source.top(Infinity);
-			option.xAxis.tickInterval = 24 * 60 * 60 * 1000;
-            option.xAxis.labels.formatter = function () {
-				return Highcharts.dateFormat('%a', new Date(this.value));
-            };
-			// _.each(sourceGroup, function(item, index){
-			// 	option.yAxis.plotLines.push({
-			// 		color: '#ccc',
-			// 		value: item.value.max,
-			// 		label: {
-			// 			text: '{value}(MAX)'.replace(/{value}/g, item.key),
-			// 			style: { color: '#ccc' }
-			// 		},
-			// 		dashStyle: 'Dot',
-			// 		width: 1
-			// 	});
-			// });
-			option.series = _.map(sourceGroup, function (group, index) {
-				return {
-					animation: true,
-					name: group.key,
-					color: option.colors[index],
-					marker: { lineColor: option.colors[index] },
-					// zIndex: source.datas.length - index,
-					data: _.map(dimension.source.filter(group.key).top(Infinity),function(item, index){
-						return [(new Date(item.datetime)).getTime(), item.price];
-					})
-				};
-			});
-			
-			$('#chart').highcharts(option);
-		}
-	});
+        $.ajax({
+            type: 'GET',
+            url: '/product/{pid}/price'.replace(/{pid}/g, pid),
+            dataType: 'json',
+            success: function (data) {
+                var dataset = crossfilter(data);
+                var dimension = {}, 
+                    group = {};
+                dimension.source = dataset.dimension(function(d) { return d.source; });
+                group.source = dimension.source.group();
+                // group.source = dimension.source.group().reduce(function(results, item) {
+                // 	results._values.push(item.price);
+                // 	results.min = Math.min(Math.min.apply(this, results._values));
+                // 	results.max = Math.max(Math.max.apply(this, results._values));
+                // 	results.sum = parseInt(results.sum + item.price);
+                // 	results.count = parseInt(results.count + 1);
+                // 	results.average = parseInt(results.sum / results.count);
+                // 	return results;
+                // }, function(results, item) {
+                // 	results._values.splice(_.indexOf(results._values, item.price), 1);
+                // 	results.min = Math.min(Math.min.apply(this, results._values));
+                // 	results.max = Math.max(Math.max.apply(this, results._values));
+                // 	results.sum = parseInt(results.sum - item.price);
+                // 	results.count = parseInt(results.count - 1);
+                // 	results.average = parseInt(results.sum / results.count);
+                // 	return results;
+                // }, function() {
+                // 	return { min: 0, max: 0, sum: 0, count: 0, average: 0, _values: [] };
+                // });
+                
+                option.xAxis.tickInterval = 24 * 60 * 60 * 1000;
+                option.xAxis.labels.formatter = function () {
+                    return Highcharts.dateFormat('%a', new Date(this.value));
+                };
+                option.series = _.map(group.source.top(Infinity), function (group, index) {
+                    var sorted = _.sortBy(dimension.source.filter(group.key).top(Infinity), function(item, index) {
+                        return item.datetime;
+                    });
+                    return {
+                        animation: true,
+                        name: group.key,
+                        color: option.colors[index],
+                        marker: { lineColor: option.colors[index] },
+                        // zIndex: source.datas.length - index,
+                        data: _.map(sorted, function(item, index) {
+                            return [(new Date(item.datetime)).getTime(), item.price];
+                        })
+                    };
+                });
+                
+                $('#chart').highcharts(option);
+            }
+        });
     }
 });
 
